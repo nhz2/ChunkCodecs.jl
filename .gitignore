@@ -1,0 +1,11 @@
+#Mac OS X
+*.DS_Store
+
+#VS Code
+/.vscode/
+
+Manifest.toml
+fixture.tar.gz
+fixture
+.CondaPkg
+*.cov

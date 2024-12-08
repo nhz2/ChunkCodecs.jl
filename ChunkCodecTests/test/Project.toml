@@ -1,0 +1,8 @@
+[deps]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+ChunkCodecCore = "0b6fb165-00bc-4d37-ab8b-79f91016dbe1"
+ChunkCodecTests = "06b1ce50-b741-4199-b118-ba5fe1a70fa7"
+
+[sources]
+ChunkCodecTests = {path = ".."}
+ChunkCodecCore = {path = "../../ChunkCodecCore"}

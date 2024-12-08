@@ -1,0 +1,21 @@
+using Random: Random
+using ChunkCodecLibLz4
+using Test: @testset, @test_throws, @test
+using Aqua: Aqua
+
+Aqua.test_all(ChunkCodecLibLz4)
+
+Random.seed!(1234)
+@testset "frame" begin
+    include("frame.jl")
+end
+@testset "block" begin
+    include("block.jl")
+end
+@testset "zarr" begin
+    include("zarr.jl")
+end
+@testset "errors" begin
+    @test sprint(Base.showerror, LZ4DecodingError("test message")) ==
+        "LZ4DecodingError: test message"
+end
