@@ -95,17 +95,17 @@ end
         # https://github.com/lz4/lz4/issues/1495#issuecomment-2307679190
         c = UInt8[0x13;0xaa;0x01;0x00;0x50;fill(0xbb,5)]
         @test f(c) == 13
-        @test decode(d, c; size_hint=13) == [fill(0xaa, 8); fill(0xbb, 5)]
+        @test decode(d, c; size_hint=Int64(13)) == [fill(0xaa, 8); fill(0xbb, 5)]
 
         # match starts starts at 12 from end with length 8
         c = UInt8[0x14;0xaa;0x01;0x00;0x40;fill(0xbb,4)]
         @test_throws LZ4DecodingError("end of block condition 2 violated") f(c)
-        @test_throws LZ4DecodingError("end of block condition 2 violated") decode(d, c; size_hint=13)
+        @test_throws LZ4DecodingError("end of block condition 2 violated") decode(d, c; size_hint=Int64(13))
 
         # match starts starts at 11 from end with length 6
         c = UInt8[0x12;0xaa;0x01;0x00;0x50;fill(0xbb,5)]
         @test_throws LZ4DecodingError("end of block condition 3 violated") f(c)
-        @test_throws LZ4DecodingError("end of block condition 3 violated") decode(d, c; size_hint=12)
+        @test_throws LZ4DecodingError("end of block condition 3 violated") decode(d, c; size_hint=Int64(12))
 
         # match starts at 9 from end
         c = UInt8[0x10;0xaa;0x01;0x00;0x50;fill(0xbb,5)]
@@ -114,7 +114,7 @@ end
         # match starts 11 from end with length 6 but offset 2
         c = UInt8[0x22;0xaa;0xaa;0x02;0x00;0x50;fill(0xbb,5)]
         @test_throws LZ4DecodingError("end of block condition 3 violated") f(c) == 13
-        @test_throws LZ4DecodingError("end of block condition 3 violated") decode(d, c; size_hint=13)
+        @test_throws LZ4DecodingError("end of block condition 3 violated") decode(d, c; size_hint=Int64(13))
     end
     @testset "errors reading offset" begin
         c = UInt8[0x13;0xaa;0x00;]
@@ -125,28 +125,28 @@ end
 
         c = UInt8[0x13;0xaa;0x02;0x00;0x50;fill(0xbb,5)]
         @test_throws LZ4DecodingError("offset is before the beginning of the output") f(c)
-        @test_throws LZ4DecodingError("offset is before the beginning of the output") decode(d, c; size_hint=100)
+        @test_throws LZ4DecodingError("offset is before the beginning of the output") decode(d, c; size_hint=Int64(100))
 
         c = UInt8[0x13;0xaa;0x01;0x00; 0x03;0x02;0x00; 0x50;fill(0xbb,5)]
         @test f(c) == 20
-        @test decode(d, c; size_hint=21) == [fill(0xaa, 15); fill(0xbb,5);]
+        @test decode(d, c; size_hint=Int64(21)) == [fill(0xaa, 15); fill(0xbb,5);]
 
         c = UInt8[0x10;0xaa;0x01;0x00; 0x03;0x05;0x00; 0x50;fill(0xbb,5)]
         @test f(c) == 17
-        @test decode(d, c; size_hint=17) == [fill(0xaa, 12); fill(0xbb,5);]
+        @test decode(d, c; size_hint=Int64(17)) == [fill(0xaa, 12); fill(0xbb,5);]
 
         c = UInt8[0x10;0xaa;0x01;0x00; 0x03;0x06;0x00; 0x50;fill(0xbb,5)]
         @test_throws LZ4DecodingError("offset is before the beginning of the output") f(c)
-        @test_throws LZ4DecodingError("offset is before the beginning of the output") decode(d, c; size_hint=100)
+        @test_throws LZ4DecodingError("offset is before the beginning of the output") decode(d, c; size_hint=Int64(100))
     end
     @testset "error reading matchlength" begin
         c = UInt8[0x10;0xaa;0x01;0x00; 0x0F;0x01;0x00;]
         @test_throws LZ4DecodingError("unexpected end of input") f(c)
-        @test_throws LZ4DecodingError("unexpected end of input") decode(d, c; size_hint=1000)
+        @test_throws LZ4DecodingError("unexpected end of input") decode(d, c; size_hint=Int64(1000))
 
         c = UInt8[0x10;0xaa;0x01;0x00; 0x0F;0x01;0x00;0xFF]
         @test_throws LZ4DecodingError("unexpected end of input") f(c)
-        @test_throws LZ4DecodingError("unexpected end of input") decode(d, c; size_hint=1000)
+        @test_throws LZ4DecodingError("unexpected end of input") decode(d, c; size_hint=Int64(1000))
     end
     @testset "exercise offsets" begin
         thing = rand(UInt8, 200)

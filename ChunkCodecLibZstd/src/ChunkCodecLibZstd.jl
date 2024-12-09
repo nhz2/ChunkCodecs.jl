@@ -7,7 +7,9 @@ using ChunkCodecCore:
     EncodeOptions,
     DecodeOptions,
     check_contiguous,
+    check_in_range,
     DecodingError
+
 import ChunkCodecCore:
     codec,
     can_concatenate,
@@ -18,8 +20,7 @@ import ChunkCodecCore:
     is_thread_safe,
     try_find_decoded_size,
     decoded_size_range,
-    decode_options,
-    create_context
+    decode_options
 
 export ZstdCodec,
     ZstdEncodeOptions,

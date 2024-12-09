@@ -14,7 +14,7 @@ Aqua.test_all(ChunkCodecLibZstd)
 
 Random.seed!(1234)
 @testset "encode_bound" begin
-    local a = decoded_size_range(ZstdEncodeOptions())
+    local a = last(decoded_size_range(ZstdEncodeOptions()))
     @test encoded_bound(ZstdEncodeOptions(), a) == typemax(Int64)
 end
 @testset "default" begin

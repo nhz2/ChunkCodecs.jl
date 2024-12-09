@@ -26,7 +26,7 @@ function BZ2EncodeOptions(::BZ2Codec=BZ2Codec();
     )
 end
 
-function decoded_size_range(::BZ2EncodeOptions)::Int64
+function decoded_size_range(::BZ2EncodeOptions)
     # prevent overflow of encoded_bound
     Int64(0):Int64(1):Int64(0x7E07_e07e_07e0_7bb8)
 end

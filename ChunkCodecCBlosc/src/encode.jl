@@ -62,7 +62,7 @@ function BloscEncodeOptions(::BloscCodec=BloscCodec();
 end
 
 # TODO update this when segfault is fixed upstream.
-decoded_size_range(::BloscEncodeOptions) = Int64(0):Int64(e.typesize):Int64(2)^30
+decoded_size_range(e::BloscEncodeOptions) = Int64(0):Int64(e.typesize):Int64(2)^30
 
 encoded_bound(::BloscEncodeOptions, src_size::Int64)::Int64 = Base.checked_add(src_size, BLOSC_MAX_OVERHEAD)
 

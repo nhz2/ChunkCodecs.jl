@@ -20,8 +20,7 @@ import ChunkCodecCore:
     is_thread_safe,
     try_find_decoded_size,
     decoded_size_range,
-    decode_options,
-    create_context
+    decode_options
 
 export LZ4FrameCodec,
     LZ4FrameEncodeOptions,
