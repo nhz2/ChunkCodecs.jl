@@ -43,7 +43,7 @@ const Z_DEFLATED   = 8
 @assert typemax(Csize_t) ≥ typemax(Cuint)
 
 function zalloc(::Ptr{Cvoid}, items::Cuint, size::Cuint)::Ptr{Cvoid}
-    s, f = Base.mul_with_overflow(items, size)
+    s, f = Base.Checked.mul_with_overflow(items, size)
     if f
         C_NULL
     else

@@ -5,14 +5,14 @@ using ChunkCodecCore: ChunkCodecCore, decode, encode, codec, Codec, EncodeOption
 export ChunkCodecCore, decode, encode, codec, Codec, EncodeOptions, DecodeOptions, DecodingError
 
 import
-ChunkCodecCBlosc,
+ChunkCodecLibBlosc,
 ChunkCodecLibBzip2,
 ChunkCodecLibLz4,
 ChunkCodecLibZlib,
 ChunkCodecLibZstd
 
 export
-ChunkCodecCBlosc,
+ChunkCodecLibBlosc,
 ChunkCodecLibBzip2,
 ChunkCodecLibLz4,
 ChunkCodecLibZlib,

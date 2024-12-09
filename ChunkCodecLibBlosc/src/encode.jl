@@ -64,7 +64,7 @@ end
 # TODO update this when segfault is fixed upstream.
 decoded_size_range(e::BloscEncodeOptions) = Int64(0):Int64(e.typesize):Int64(2)^30
 
-encoded_bound(::BloscEncodeOptions, src_size::Int64)::Int64 = Base.checked_add(src_size, BLOSC_MAX_OVERHEAD)
+encoded_bound(::BloscEncodeOptions, src_size::Int64)::Int64 = Base.Checked.checked_add(src_size, BLOSC_MAX_OVERHEAD)
 
 function try_encode!(e::BloscEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
     check_contiguous(dst)

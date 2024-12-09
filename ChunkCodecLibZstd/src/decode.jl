@@ -62,7 +62,7 @@ function try_find_decoded_size(::ZstdDecodeOptions, src::AbstractVector{UInt8}):
         if frameContentSize > typemax(Int64) # also handles ZSTD_CONTENTSIZE_ERROR
             throw(ZstdDecodingError(:decoded_size_error))
         end
-        decompressedSize, overflow = Base.add_with_overflow(decompressedSize, frameContentSize%Int64)
+        decompressedSize, overflow = Base.Checked.add_with_overflow(decompressedSize, frameContentSize%Int64)
         if overflow
             throw(ZstdDecodingError(:decoded_size_overflow))
         end

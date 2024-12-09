@@ -77,14 +77,14 @@ julia> gzipped_data = encode(e, data)
 
 For example:
 ```julia-repl
-julia> encode(ChunkCodecCBlosc.BloscEncodeOptions(), @view(zeros(UInt8, 8)[1:2:end]))
+julia> encode(ChunkCodecLibBlosc.BloscEncodeOptions(), @view(zeros(UInt8, 8)[1:2:end]))
 ERROR: ArgumentError: vector is not contiguous in memory
 
-julia> encode(ChunkCodecCBlosc.BloscEncodeOptions(), zeros(UInt8, Int64(2)^32))
+julia> encode(ChunkCodecLibBlosc.BloscEncodeOptions(), zeros(UInt8, Int64(2)^32))
 ERROR: ArgumentError: src_size ∈ 0:1:1073741824 must hold. Got
 src_size => 4294967296
 
-julia> encode(ChunkCodecCBlosc.BloscEncodeOptions(;typesize=3), zeros(UInt8,7))
+julia> encode(ChunkCodecLibBlosc.BloscEncodeOptions(;typesize=3), zeros(UInt8,7))
 ERROR: ArgumentError: src_size ∈ 0:3:1073741823 must hold. Got
 src_size => 7
 ```

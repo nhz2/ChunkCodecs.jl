@@ -92,7 +92,7 @@ is_thread_safe(::_AllEncodeOptions) = true
 # If alternate settings are used this must be modified.
 function encoded_bound(e::_AllEncodeOptions, src_size::Int64)::Int64
     wraplen = _wraplen(e)
-    Base.checked_add(
+    Base.Checked.checked_add(
         src_size,
         src_size>>12 + src_size>>14 + src_size>>25 + Int64(7) + wraplen
     )

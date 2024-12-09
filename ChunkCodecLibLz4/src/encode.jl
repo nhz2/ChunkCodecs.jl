@@ -205,7 +205,7 @@ end
 decoded_size_range(e::LZ4ZarrEncodeOptions) = Int64(0):Int64(1):min(last(decoded_size_range(e.block_options)), Int64(typemax(Int32)))
 
 function encoded_bound(e::LZ4ZarrEncodeOptions, src_size::Int64)::Int64
-    Base.checked_add(encoded_bound(e.block_options, src_size), Int64(4))
+    Base.Checked.checked_add(encoded_bound(e.block_options, src_size), Int64(4))
 end
 
 function try_encode!(e::LZ4ZarrEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}

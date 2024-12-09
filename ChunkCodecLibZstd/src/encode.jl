@@ -58,7 +58,7 @@ function encoded_bound(::ZstdEncodeOptions, src_size::Int64)::Int64
     else 
         Int64(0)
     end::Int64
-    Base.checked_add(
+    Base.Checked.checked_add(
         src_size,
         src_size>>8 + margin,
     )

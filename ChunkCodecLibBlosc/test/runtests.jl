@@ -1,6 +1,6 @@
 using Random: Random
-using ChunkCodecCBlosc:
-    ChunkCodecCBlosc,
+using ChunkCodecLibBlosc:
+    ChunkCodecLibBlosc,
     BloscCodec,
     BloscEncodeOptions,
     BloscDecodeOptions,
@@ -10,7 +10,7 @@ using ChunkCodecTests: test_codec
 using Test: @testset, @test_throws, @test
 using Aqua: Aqua
 
-Aqua.test_all(ChunkCodecCBlosc)
+Aqua.test_all(ChunkCodecLibBlosc)
 
 Random.seed!(1234)
 
@@ -41,9 +41,9 @@ end
     @test e.typesize == 1
     e = BloscEncodeOptions(;typesize=-1)
     @test e.typesize == 1
-    e = BloscEncodeOptions(;typesize=ChunkCodecCBlosc.BLOSC_MAX_TYPESIZE)
-    @test e.typesize == ChunkCodecCBlosc.BLOSC_MAX_TYPESIZE
-    e = BloscEncodeOptions(;typesize=ChunkCodecCBlosc.BLOSC_MAX_TYPESIZE+1)
+    e = BloscEncodeOptions(;typesize=ChunkCodecLibBlosc.BLOSC_MAX_TYPESIZE)
+    @test e.typesize == ChunkCodecLibBlosc.BLOSC_MAX_TYPESIZE
+    e = BloscEncodeOptions(;typesize=ChunkCodecLibBlosc.BLOSC_MAX_TYPESIZE+1)
     @test e.typesize == 1
     @test_throws ArgumentError BloscEncodeOptions(;compressor="")
     @test_throws ArgumentError BloscEncodeOptions(;compressor="asfdgfsdgrwwea")

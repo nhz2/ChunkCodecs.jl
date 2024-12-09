@@ -14,7 +14,6 @@ import ChunkCodecCore:
     codec,
     can_concatenate,
     try_decode!,
-    try_resize_decode!,
     try_encode!,
     encoded_bound,
     is_thread_safe,

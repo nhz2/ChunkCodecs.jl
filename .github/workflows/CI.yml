@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         package:
-          - 'ChunkCodecCBlosc'
+          - 'ChunkCodecLibBlosc'
           - 'ChunkCodecCore'
           - 'ChunkCodecLibBzip2'
           - 'ChunkCodecLibLz4'

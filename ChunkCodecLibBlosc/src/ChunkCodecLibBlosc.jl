@@ -1,4 +1,4 @@
-module ChunkCodecCBlosc
+module ChunkCodecLibBlosc
 
 using Blosc_jll: libblosc
 
@@ -49,4 +49,4 @@ decode_options(::BloscCodec) = BloscDecodeOptions() # default decode options
 include("encode.jl")
 include("decode.jl")
 
-end # module ChunkCodecCBlosc
+end # module ChunkCodecLibBlosc

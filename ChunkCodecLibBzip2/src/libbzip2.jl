@@ -24,7 +24,7 @@ const BZ_CONFIG_ERROR     = (-9)
 @assert typemax(Csize_t) ≥ typemax(Cint)
 
 function bzalloc(::Ptr{Cvoid}, m::Cint, n::Cint)::Ptr{Cvoid}
-    s, f = Base.mul_with_overflow(m, n)
+    s, f = Base.Checked.mul_with_overflow(m, n)
     if f || signbit(s)
         C_NULL
     else

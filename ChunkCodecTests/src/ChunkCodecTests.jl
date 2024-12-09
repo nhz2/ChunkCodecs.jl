@@ -16,7 +16,8 @@ using ChunkCodecCore:
     try_encode!,
     try_decode!,
     try_resize_decode!
-using Test
+
+using Test: Test, @test, @test_throws
 
 export test_codec
 
