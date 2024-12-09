@@ -84,7 +84,7 @@ end
             decode(d, max_cint_zeros; max_size=Int64(2)^24),
         )
         DecodedSizeError
-        if Sys.WORD_SIZE == 64 && !get(Returns(false), ENV, "CI")
+        if Sys.WORD_SIZE == 64 && get(Returns("false"), ENV, "CI") != "true"
             input = zeros(UInt8, m)
             for i in m:-1:m-16
                 local c = encode(e, @view(input[1:i]))
