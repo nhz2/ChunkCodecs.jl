@@ -75,12 +75,7 @@ function try_resize_decode!(d::BZ2DecodeOptions, dst::AbstractVector{UInt8}, src
                     stream.avail_out = start_avail_out
                     stream.next_in = src_p + (src_size - src_left)
                     stream.next_out = dst_p + (dst_size - dst_left)
-                    ret = ccall(
-                        (:BZ2_bzDecompress, libbzip2),
-                        Cint,
-                        (Ref{BZStream},),
-                        stream,
-                    )
+                    ret = BZ2_bzDecompress(stream)
                     if ret == BZ_OK || ret == BZ_STREAM_END
                         @assert stream.avail_in ≤ start_avail_in
                         @assert stream.avail_out ≤ start_avail_out

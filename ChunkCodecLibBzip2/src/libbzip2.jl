@@ -1,8 +1,10 @@
 # Constants and c wrapper functions ported to Julia from bzlib.h bzip2/libbzip2 version 1.0.8 of 13 July 2019
 
-const BZ_RUN              = 0
-const BZ_FLUSH            = 1
-const BZ_FINISH           = 2
+const WIN32 = Sys.iswindows() && Sys.WORD_SIZE == 32
+
+const BZ_RUN              = Cint(0)
+const BZ_FLUSH            = Cint(1)
+const BZ_FINISH           = Cint(2)
 
 const BZ_OK               = 0
 const BZ_RUN_OK           = 1
@@ -61,12 +63,22 @@ mutable struct BZStream
 end
 
 function BZ2_bzCompressInit(stream::BZStream, blockSize100k::Cint)
-    ret = ccall(
+    @static if WIN32
+        ret = ccall(
+            ("BZ2_bzCompressInit@16", libbzip2),
+            stdcall,
+            Cint,
+            (Ref{BZStream}, Cint, Cint, Cint),
+            stream, blockSize100k, 0, 0,
+        )
+    else
+        ret = ccall(
             (:BZ2_bzCompressInit, libbzip2),
             Cint,
             (Ref{BZStream}, Cint, Cint, Cint),
             stream, blockSize100k, 0, 0,
-    )
+        )
+    end
     # error out if init failed
     if ret != BZ_OK
         if ret == BZ_CONFIG_ERROR
@@ -82,26 +94,63 @@ function BZ2_bzCompressInit(stream::BZStream, blockSize100k::Cint)
     nothing
 end
 
+function BZ2_bzCompress(stream, action::Cint)::Cint
+    @static if WIN32
+        ccall(
+            ("BZ2_bzCompress@8", libbzip2),
+            Cint,
+            (Ref{BZStream}, Cint),
+            stream, action,
+        )
+    else
+        ccall(
+            (:BZ2_bzCompress, libbzip2),
+            Cint,
+            (Ref{BZStream}, Cint),
+            stream, action,
+        )
+    end
+end
+
 function BZ2_bzCompressEnd(stream::BZStream)
     # free bzip2 stream state, not much to do if this fails
     if stream.state != C_NULL
-        ccall(
-            (:BZ2_bzCompressEnd, libbzip2),
-            Cint,
-            (Ref{BZStream},),
-            stream,
-        )
+        @static if WIN32
+            ccall(
+                ("BZ2_bzCompressEnd@4", libbzip2),
+                stdcall,
+                Cint,
+                (Ref{BZStream},),
+                stream,
+            )
+        else
+            ccall(
+                (:BZ2_bzCompressEnd, libbzip2),
+                Cint,
+                (Ref{BZStream},),
+                stream,
+            )
+        end
     end
     nothing
 end
 
 function BZ2_bzDecompressInit(stream::BZStream)
-    ret = ccall(
-            (:BZ2_bzDecompressInit, libbzip2),
-            Cint,
-            (Ref{BZStream}, Cint, Cint),
-            stream, 0, 0,
-    )
+    @static if WIN32
+        ret = ccall(
+                ("BZ2_bzDecompressInit@12", libbzip2),
+                Cint,
+                (Ref{BZStream}, Cint, Cint),
+                stream, 0, 0,
+        )
+    else
+        ret = ccall(
+                (:BZ2_bzDecompressInit, libbzip2),
+                Cint,
+                (Ref{BZStream}, Cint, Cint),
+                stream, 0, 0,
+        )
+    end
     # error out if init failed
     if ret != BZ_OK
         if ret == BZ_CONFIG_ERROR
@@ -117,15 +166,42 @@ function BZ2_bzDecompressInit(stream::BZStream)
     nothing
 end
 
-function BZ2_bzDecompressEnd(stream::BZStream)
-    # free bzip2 stream state, not much to do if this fails
-    if stream.state != C_NULL
+function BZ2_bzDecompress(stream::BZStream)::Cint
+    @static if WIN32
         ccall(
-            (:BZ2_bzDecompressEnd, libbzip2),
+            ("BZ2_bzDecompress@4", libbzip2),
             Cint,
             (Ref{BZStream},),
             stream,
         )
+    else
+        ccall(
+            (:BZ2_bzDecompress, libbzip2),
+            Cint,
+            (Ref{BZStream},),
+            stream,
+        )
+    end
+end
+
+function BZ2_bzDecompressEnd(stream::BZStream)
+    # free bzip2 stream state, not much to do if this fails
+    if stream.state != C_NULL
+        @static if WIN32
+            ccall(
+                ("BZ2_bzDecompressEnd@4", libbzip2),
+                Cint,
+                (Ref{BZStream},),
+                stream,
+            )
+        else
+            ccall(
+                (:BZ2_bzDecompressEnd, libbzip2),
+                Cint,
+                (Ref{BZStream},),
+                stream,
+            )
+        end
     end
     nothing
 end

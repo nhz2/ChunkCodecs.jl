@@ -70,12 +70,7 @@ function try_encode!(e::BZ2EncodeOptions, dst::AbstractVector{UInt8}, src::Abstr
                 else
                     BZ_RUN
                 end
-                ret = ccall(
-                    (:BZ2_bzCompress, libbzip2),
-                    Cint,
-                    (Ref{BZStream}, Cint),
-                    stream, action,
-                )
+                ret = BZ2_bzCompress(stream, action)
                 @assert stream.avail_in ≤ start_avail_in
                 @assert stream.avail_out ≤ start_avail_out
                 # there must be progress

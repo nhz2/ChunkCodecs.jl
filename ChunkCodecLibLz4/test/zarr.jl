@@ -50,10 +50,10 @@ end
 @testset "max decoded size" begin
     d = LZ4ZarrDecodeOptions()
     c = UInt8[0xFF;0xFF;0xFF;0x7F; 0x1F;0x00;0x01;0x00;fill(0xFF,8421504);0x66;0x50;fill(0x00,5)]
-    if Sys.WORD_SIZE == 64
+    if Sys.WORD_SIZE == 64 && !get(Returns(false), ENV, "CI")
         out = decode(d, c)
         @test all(iszero, out)
         @test length(out) == typemax(Cint)
     end
-    @test_throws DecodedSizeError(2^24, typemax(Int32)) decode(d, c; max_size = 2^24)
+    @test_throws DecodedSizeError(2^24, typemax(Int32)) decode(d, c; max_size=Int64(2)^24)
 end
