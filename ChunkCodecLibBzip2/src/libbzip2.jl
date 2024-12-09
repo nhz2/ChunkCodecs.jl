@@ -98,6 +98,7 @@ function BZ2_bzCompress(stream, action::Cint)::Cint
     @static if WIN32
         ccall(
             ("BZ2_bzCompress@8", libbzip2),
+            stdcall,
             Cint,
             (Ref{BZStream}, Cint),
             stream, action,
@@ -139,6 +140,7 @@ function BZ2_bzDecompressInit(stream::BZStream)
     @static if WIN32
         ret = ccall(
                 ("BZ2_bzDecompressInit@12", libbzip2),
+                stdcall,
                 Cint,
                 (Ref{BZStream}, Cint, Cint),
                 stream, 0, 0,
@@ -170,6 +172,7 @@ function BZ2_bzDecompress(stream::BZStream)::Cint
     @static if WIN32
         ccall(
             ("BZ2_bzDecompress@4", libbzip2),
+            stdcall,
             Cint,
             (Ref{BZStream},),
             stream,
@@ -190,6 +193,7 @@ function BZ2_bzDecompressEnd(stream::BZStream)
         @static if WIN32
             ccall(
                 ("BZ2_bzDecompressEnd@4", libbzip2),
+                stdcall,
                 Cint,
                 (Ref{BZStream},),
                 stream,
