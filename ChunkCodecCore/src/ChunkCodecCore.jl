@@ -9,7 +9,6 @@ public DecodingError
 public DecodedSizeError
 public can_concatenate
 public is_thread_safe
-public options
 public decoded_size_range
 public encoded_bound
 public try_encode!

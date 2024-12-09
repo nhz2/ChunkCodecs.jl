@@ -20,7 +20,7 @@ codec(::NoopEncodeOptions) = NoopCodec()
 
 is_thread_safe(::NoopEncodeOptions) = true
 
-decoded_size_range(::NoopEncodeOptions) = Int64(0):Int64(1):typemax(Int64)
+decoded_size_range(::NoopEncodeOptions) = Int64(0):Int64(1):typemax(Int64)-Int64(1)
 
 encoded_bound(::NoopEncodeOptions, src_size::Int64)::Int64 = src_size
 

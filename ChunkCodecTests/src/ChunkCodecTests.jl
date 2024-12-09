@@ -7,7 +7,6 @@ using ChunkCodecCore:
     codec,
     can_concatenate,
     decode_options,
-    create_context,
     decoded_size_range,
     encoded_bound,
     encode,
@@ -32,6 +31,7 @@ function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
     @test !isempty(srange)
     @test step(srange) > 0
     @test first(srange) ≥ 0
+    @test last(srange) != typemax(Int64) # avoid length overflow
 
     for s in [first(srange):step(srange):min(last(srange), 1000); rand(srange, 10000); last(srange)]
         @test encoded_bound(e, s) isa Int64
@@ -125,8 +125,8 @@ function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
 
     # can_concatenate tests
     if can_concatenate(c)
-        a = rand(UInt8, 100*dec_elsize)
-        b = rand(UInt8, 200*dec_elsize)
+        a = rand(UInt8, 100*step(srange))
+        b = rand(UInt8, 200*step(srange))
         @test decode(d, [encode(e, a); encode(e, b);]) == [a; b;]
         @test decode(d, [encode(e, UInt8[]); encode(e, UInt8[]);]) == UInt8[]
     end
