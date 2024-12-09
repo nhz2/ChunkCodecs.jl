@@ -39,7 +39,7 @@ this is where options can be set to tune performance.
 julia> e = GzipEncodeOptions(;level=4)
 GzipEncodeOptions(4)
 
-julia> e isa EncodeOptions
+julia> e isa ChunkCodecCore.EncodeOptions
 true
 ```
 
@@ -52,7 +52,7 @@ The `Codec` object returned by `codec` has the meta data required for reliable d
 julia> gz_codec = codec(e)
 GzipCodec()
 
-julia> gz_codec isa Codec
+julia> gz_codec isa ChunkCodecCore.Codec
 true
 ```
 
@@ -81,11 +81,12 @@ julia> encode(ChunkCodecCBlosc.BloscEncodeOptions(), @view(zeros(UInt8, 8)[1:2:e
 ERROR: ArgumentError: vector is not contiguous in memory
 
 julia> encode(ChunkCodecCBlosc.BloscEncodeOptions(), zeros(UInt8, Int64(2)^32))
-ERROR: ArgumentError: src_size ∈ 0:1073741824 must hold. Got
+ERROR: ArgumentError: src_size ∈ 0:1:1073741824 must hold. Got
 src_size => 4294967296
 
 julia> encode(ChunkCodecCBlosc.BloscEncodeOptions(;typesize=3), zeros(UInt8,7))
-ERROR: ArgumentError: src_size 7 is not a multiple of the decoded element size 3
+ERROR: ArgumentError: src_size ∈ 0:3:1073741823 must hold. Got
+src_size => 7
 ```
 
 ## Decoding
@@ -119,7 +120,7 @@ julia> bad_gzipped_data[end-4] ⊻= 0x01;
 julia> decode(GzipCodec(), bad_gzipped_data);
 ERROR: LibzDecodingError: incorrect data check
 
-julia> LibzDecodingError <: DecodingError
+julia> LibzDecodingError <: ChunkCodecCore.DecodingError
 true
 ```
 
