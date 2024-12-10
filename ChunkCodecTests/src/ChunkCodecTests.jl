@@ -5,6 +5,7 @@ using ChunkCodecCore:
     EncodeOptions,
     DecodeOptions,
     codec,
+    is_thread_safe,
     can_concatenate,
     decode_options,
     decoded_size_range,
@@ -25,6 +26,8 @@ function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
     @test decode_options(c) isa DecodeOptions
     @test codec(e) == c
     @test codec(d) == c
+    @test is_thread_safe(e) isa Bool
+    @test is_thread_safe(d) isa Bool
 
     @test decoded_size_range(e) isa StepRange{Int64, Int64}
 

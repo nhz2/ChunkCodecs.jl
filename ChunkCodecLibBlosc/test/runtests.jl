@@ -60,4 +60,9 @@ end
     @test_throws BloscDecodingError decode(BloscDecodeOptions(), UInt8[0x00])
     # check that a buffer with extra data throws a BloscDecodingError
     @test_throws BloscDecodingError decode(BloscDecodeOptions(), [c; 0x00;])
+    # check corrupting LZ4 encoding throws a BloscDecodingError
+    u = zeros(UInt8, 1000)
+    c = encode(BloscEncodeOptions(), u)
+    c[end-5] = 0x40
+    @test_throws BloscDecodingError decode(BloscDecodeOptions(), c)
 end
