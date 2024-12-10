@@ -1,21 +1,22 @@
 module ChunkCodecs
 
-using ChunkCodecCore: ChunkCodecCore, decode, encode, codec, Codec, EncodeOptions, DecodeOptions, DecodingError
+# reexport ChunkCodecCore
+using ChunkCodecCore: ChunkCodecCore, encode, decode, codec
+export ChunkCodecCore, encode, decode, codec
 
-export ChunkCodecCore, decode, encode, codec, Codec, EncodeOptions, DecodeOptions, DecodingError
+codec_packages = [
+    :ChunkCodecLibBlosc,
+    :ChunkCodecLibBzip2,
+    :ChunkCodecLibLz4,
+    :ChunkCodecLibZlib,
+    :ChunkCodecLibZstd,
+]
 
-import
-ChunkCodecLibBlosc,
-ChunkCodecLibBzip2,
-ChunkCodecLibLz4,
-ChunkCodecLibZlib,
-ChunkCodecLibZstd
 
-export
-ChunkCodecLibBlosc,
-ChunkCodecLibBzip2,
-ChunkCodecLibLz4,
-ChunkCodecLibZlib,
-ChunkCodecLibZstd
+for p in codec_packages
+    @eval import $(p)
+    @eval export $(p)
+end
+
 
 end # module ChunkCodecs

@@ -5,17 +5,29 @@
 
 A consistent Julia interface for lossless encoding and decoding of bytes in memory.
 
-This monorepo hold a number of different Julia packages:
+## Repository directories
 
-1. ChunkCodecCore: defines the interface.
-1. ChunkCodecTests: defines tests for the interface.
-1. ChunkCodecs: uses all the other ChunkCodec* packages.
+This monorepo holds a number of different Julia packages:
+
+- `ChunkCodecCore`: defines the interface.
+- `ChunkCodecTests`: defines tests for the interface.
+- `ChunkCodecs`: uses all the other ChunkCodec* packages.
 
 There are also a number of packages with glue code to implement the interface for various C libraries.
 
-# Simple encoding and decoding
+- `ChunkCodecLibBlosc`
+- `ChunkCodecLibBzip2`
+- `ChunkCodecLibLz4`
+- `ChunkCodecLibZlib`
+- `ChunkCodecLibZstd`
 
-## Encoding
+Each package contains basic tests.
+
+There is also a `test` directory for slower compatibility tests.
+
+## Simple encoding and decoding
+
+### Encoding
 
 Let say you want to encode some data into the gzip (.gz) format.
 
@@ -30,7 +42,7 @@ In this case `ChunkCodecLibZlib`
 julia> using ChunkCodecLibZlib
 ```
 
-### `EncodeOptions`
+#### `EncodeOptions`
 
 Next create a `GzipEncodeOptions`
 this is where options can be set to tune performance.
@@ -60,7 +72,7 @@ true
 
 You can look at the docstring `help?> GzipCodec` to learn more about the format.
 
-### `encode`
+#### `encode`
 
 Finally you can encode the data:
 
@@ -69,7 +81,7 @@ julia> gzipped_data = encode(e, data)
 29-element Vector{UInt8}:
 ```
 
-### Requirements for `encode` to work
+#### Requirements for `encode` to work
 `encode` will throw an error if the following conditions aren't met.
 
 1. The input data is stored contiguous memory.
@@ -89,7 +101,7 @@ ERROR: ArgumentError: src_size ∈ 0:3:1073741823 must hold. Got
 src_size => 7
 ```
 
-## Decoding
+### Decoding
 
 Lets say you have trusted gzipped data you want to decode.
 
@@ -150,3 +162,5 @@ julia> @time decode(GzipCodec(), gzipped_data; max_size=1000);
 Some encoding and decoding libraries do not support multithreading.
 
 If `ChunkCodecCore.is_thread_safe(::Union{Codec, DecodeOptions, EncodeOptions})` returns `true` it is safe to use the options to encode or decode concurrently in multiple threads.
+
+## Related packages

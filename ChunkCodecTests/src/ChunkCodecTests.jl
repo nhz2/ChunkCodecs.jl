@@ -40,7 +40,10 @@ function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
     end
 
     # round trip tests
-    decoded_sizes = [first(srange):step(srange):min(last(srange), first(srange)+step(srange)); rand(first(srange):step(srange):min(last(srange), 2000000), trials);]
+    decoded_sizes = [
+        first(srange):step(srange):min(last(srange), first(srange)+10*step(srange));
+        rand(first(srange):step(srange):min(last(srange), 2000000), trials);
+    ]
     for s in decoded_sizes
         # generate data
         local choice = rand(1:4)
