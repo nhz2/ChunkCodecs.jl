@@ -44,8 +44,7 @@ julia> using ChunkCodecLibZlib
 
 #### `EncodeOptions`
 
-Next create a `GzipEncodeOptions`
-this is where options can be set to tune performance.
+Next create a `GzipEncodeOptions` and select options to tune performance.
 
 ```julia-repl
 julia> e = GzipEncodeOptions(;level=4)
@@ -58,7 +57,7 @@ true
 Most of the parameters in an `EncodeOptions` are not needed to be able to
 decode back to the original data.
 
-The `Codec` object returned by `codec` has the meta data required for reliable decoding.
+The `Codec` object returned by `codec` has the meta data required for decoding.
 
 ```julia-repl
 julia> gz_codec = codec(e)
@@ -136,7 +135,7 @@ julia> LibzDecodingError <: ChunkCodecCore.DecodingError
 true
 ```
 
-The encoded input may also contain a zip bomb, where the size of the decoded output is way too large.
+The encoded input may also contain a zip bomb.
 The `max_size` keyword argument causes `decode` to throw a `ChunkCodecCore.DecodedSizeError` if decoding fails because the output size would be greater than `max_size`. By default `max_size` is `typemax(Int64)`.
 
 For example:
@@ -159,8 +158,19 @@ julia> @time decode(GzipCodec(), gzipped_data; max_size=1000);
 
 ## Multithreading
 
-Some encoding and decoding libraries do not support multithreading.
-
 If `ChunkCodecCore.is_thread_safe(::Union{Codec, DecodeOptions, EncodeOptions})` returns `true` it is safe to use the options to encode or decode concurrently in multiple threads.
 
 ## Related packages
+
+### Julia
+
+https://github.com/JuliaIO/TranscodingStreams.jl
+
+Filters in https://github.com/JuliaIO/HDF5.jl
+
+### Python
+
+https://github.com/cgohlke/imagecodecs
+
+https://github.com/zarr-developers/numcodecs
+
