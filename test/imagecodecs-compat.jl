@@ -9,7 +9,7 @@ codecs = [
     (ChunkCodecLibLz4.LZ4ZarrEncodeOptions(),   ("lz4",     (;header=true)), 1000),
     (ChunkCodecLibLz4.LZ4FrameEncodeOptions(),  ("lz4f",    (;)), 1000),
     (ChunkCodecLibZlib.ZlibEncodeOptions(),     ("zlib",    (;)), 100),
-    (ChunkCodecLibZlib.DeflateEncodeOptions(),  ("deflate", (;raw=true), 0b10), 300), # encode only
+    (ChunkCodecLibZlib.DeflateEncodeOptions(),  ("deflate", (;raw=true)), 100),
     (ChunkCodecLibZlib.GzipEncodeOptions(),     ("gzip",    (;)), 100),
     (ChunkCodecLibZstd.ZstdEncodeOptions(),     ("zstd",    (;)), 300),
 ]
@@ -17,10 +17,6 @@ codecs = [
 @testset "$(jl_options) $(im_options)" for (jl_options, im_options, trials) in codecs
     im_name = im_options[1]
     im_enc_funct, im_dec_funct = pyimport("imagecodecs" => ("$(im_name)_encode", "$(im_name)_decode"))
-    im_enc(x) = pyconvert(Vector, im_enc_funct(x; im_options[2]...))
-    im_dec(x) = pyconvert(Vector, im_dec_funct(x; im_options[2]...))
-    jl_dec(x) = decode(codec(jl_options), x)
-    jl_enc(x) = encode(jl_options, x)
     srange = ChunkCodecCore.decoded_size_range(jl_options)
     # round trip tests
     decoded_sizes = [
@@ -28,6 +24,10 @@ codecs = [
         rand(first(srange):step(srange):min(last(srange), 2000000), trials);
     ]
     for s in decoded_sizes
+        im_enc(x) = pyconvert(Vector, im_enc_funct(x; im_options[2]...))
+        im_dec(x) = pyconvert(Vector, im_dec_funct(x; out=zeros(UInt8, s), im_options[2]...))
+        jl_dec(x) = decode(codec(jl_options), x; size_hint=s)
+        jl_enc(x) = encode(jl_options, x)
         # generate data
         local choice = rand(1:4)
         local data = if choice == 1
