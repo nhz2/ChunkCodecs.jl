@@ -54,8 +54,8 @@ end
 
 @testset "decode size_hint and resizing" begin
     d = TestDecodeOptions()
-    @test decode(d, ones(UInt8, 100); size_hint=200) == ones(UInt8, 100)
-    @test decode(d, ones(UInt8, 100); size_hint=99) == ones(UInt8, 100)
-    @test decode(d, ones(UInt8, 100); size_hint=99, max_size=100) == ones(UInt8, 100)
-    @test_throws DecodedSizeError decode(d, ones(UInt8, 100); size_hint=200, max_size=99)
+    @test decode(d, ones(UInt8, Int64(100)); size_hint=Int64(200)) == ones(UInt8, Int64(100))
+    @test decode(d, ones(UInt8, Int64(100)); size_hint=Int64(99)) == ones(UInt8, Int64(100))
+    @test decode(d, ones(UInt8, Int64(100)); size_hint=Int64(99), max_size=Int64(100)) == ones(UInt8, Int64(100))
+    @test_throws DecodedSizeError decode(d, ones(UInt8, Int64(100)); size_hint=Int64(200), max_size=Int64(99))
 end
