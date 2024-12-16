@@ -60,7 +60,7 @@ function try_encode!(e::BZ2EncodeOptions, dst::AbstractVector{UInt8}, src::Abstr
             src_left::Int64 = src_size
             dst_left::Int64 = dst_size
             while true
-                start_avail_in = min(clamp(src_left, Cuint), Cuint(2^26))
+                start_avail_in = clamp(src_left, Cuint)
                 start_avail_out = clamp(dst_left, Cuint)
                 stream.avail_in = start_avail_in
                 stream.avail_out = start_avail_out

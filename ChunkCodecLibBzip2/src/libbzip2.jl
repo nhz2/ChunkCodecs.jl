@@ -1,5 +1,7 @@
 # Constants and c wrapper functions ported to Julia from bzlib.h bzip2/libbzip2 version 1.0.8 of 13 July 2019
 
+# This is needed because the header file uses the WINAPI macro when compiled for WIN32.
+# This means the stdcall calling convention needs to be used on WIN32.
 const WIN32 = Sys.iswindows() && Sys.WORD_SIZE == 32
 
 const BZ_RUN              = Cint(0)

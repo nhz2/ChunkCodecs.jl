@@ -53,3 +53,13 @@ end
     @test sprint(Base.showerror, BZ2DecodingError(-100)) ==
         "BZ2DecodingError: unknown bzip2 error code: -100"
 end
+@testset "encoding over 4GB" begin
+    if Sys.WORD_SIZE == 64 && Sys.total_memory() > 15*Int64(2)^30
+        i = Int64(2)^32 + 1
+        c = encode(BZ2EncodeOptions(), zeros(UInt8, i))
+        allzero = all(iszero, decode(BZ2Codec(), c; size_hint=i))
+        @test allzero
+    else
+        @warn "skipping large memory tests"
+    end
+end
