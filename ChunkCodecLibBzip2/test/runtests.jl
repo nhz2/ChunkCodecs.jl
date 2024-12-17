@@ -55,10 +55,12 @@ end
 end
 @testset "encoding over 4GB" begin
     if Sys.WORD_SIZE == 64 && Sys.total_memory() > 15*Int64(2)^30
-        i = Int64(2)^32 + 1
-        c = encode(BZ2EncodeOptions(), zeros(UInt8, i))
-        allzero = all(iszero, decode(BZ2Codec(), c; size_hint=i))
-        @test allzero
+        n = Int64(2)^32 + 1
+        c = encode(BZ2EncodeOptions(), zeros(UInt8, n))
+        u = decode(BZ2Codec(), c; size_hint=n)
+        all_zero = all(iszero, u)
+        len_n = length(u) == n
+        @test all_zero && len_n
     else
         @warn "skipping large memory tests"
     end

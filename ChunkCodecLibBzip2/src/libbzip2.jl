@@ -8,20 +8,20 @@ const BZ_RUN              = Cint(0)
 const BZ_FLUSH            = Cint(1)
 const BZ_FINISH           = Cint(2)
 
-const BZ_OK               = 0
-const BZ_RUN_OK           = 1
-const BZ_FLUSH_OK         = 2
-const BZ_FINISH_OK        = 3
-const BZ_STREAM_END       = 4
-const BZ_SEQUENCE_ERROR   = (-1)
-const BZ_PARAM_ERROR      = (-2)
-const BZ_MEM_ERROR        = (-3)
-const BZ_DATA_ERROR       = (-4)
-const BZ_DATA_ERROR_MAGIC = (-5)
-const BZ_IO_ERROR         = (-6)
-const BZ_UNEXPECTED_EOF   = (-7)
-const BZ_OUTBUFF_FULL     = (-8)
-const BZ_CONFIG_ERROR     = (-9)
+const BZ_OK               = Cint(0)
+const BZ_RUN_OK           = Cint(1)
+const BZ_FLUSH_OK         = Cint(2)
+const BZ_FINISH_OK        = Cint(3)
+const BZ_STREAM_END       = Cint(4)
+const BZ_SEQUENCE_ERROR   = Cint(-1)
+const BZ_PARAM_ERROR      = Cint(-2)
+const BZ_MEM_ERROR        = Cint(-3)
+const BZ_DATA_ERROR       = Cint(-4)
+const BZ_DATA_ERROR_MAGIC = Cint(-5)
+const BZ_IO_ERROR         = Cint(-6)
+const BZ_UNEXPECTED_EOF   = Cint(-7)
+const BZ_OUTBUFF_FULL     = Cint(-8)
+const BZ_CONFIG_ERROR     = Cint(-9)
 
 @assert typemax(Csize_t) ≥ typemax(Cint)
 
@@ -96,7 +96,7 @@ function BZ2_bzCompressInit(stream::BZStream, blockSize100k::Cint)
     nothing
 end
 
-function BZ2_bzCompress(stream, action::Cint)::Cint
+function BZ2_bzCompress(stream::BZStream, action::Cint)::Cint
     @static if WIN32
         ccall(
             ("BZ2_bzCompress@8", libbzip2),

@@ -28,7 +28,7 @@ end
 
 function decoded_size_range(::BZ2EncodeOptions)
     # prevent overflow of encoded_bound
-    Int64(0):Int64(1):Int64(0x7E07_e07e_07e0_7bb8)
+    Int64(0):Int64(1):Int64(0x7e07_e07e_07e0_7bb8)
 end
 
 # According to the docs https://sourceware.org/bzip2/manual/manual.html:
