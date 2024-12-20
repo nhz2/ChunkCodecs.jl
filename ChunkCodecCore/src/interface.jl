@@ -241,7 +241,12 @@ try_find_decoded_size(c::Codec, src::AbstractVector{UInt8}) = try_find_decoded_s
 try_decode!(c::Codec, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...) = try_decode!(decode_options(c), dst, src)
 try_resize_decode!(c::Codec, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...) = try_resize_decode!(decode_options(c), dst, src)
 
+"""
+    check_contiguous(x::AbstractVector{UInt8})
 
+Check if the given vector is contiguous in memory.
+Throw an error if the vector is not contiguous or if its length cannot be represented as Int64.
+"""
 function check_contiguous(x::AbstractVector{UInt8})
     y = Base.cconvert(Ptr{UInt8}, x)
     GC.@preserve y Base.unsafe_convert(Ptr{UInt8}, y)
@@ -251,6 +256,16 @@ function check_contiguous(x::AbstractVector{UInt8})
     nothing
 end
 
+"""
+    check_in_range(range; kwargs...)
+
+Check if all keyword arguments are within the specified range.
+Throw an `ArgumentError` if any value is outside the range.
+
+# Arguments
+- `range`: The allowed range of values
+- `kwargs...`: Keyword arguments to check against the range
+"""
 function check_in_range(range; kwargs...)
     for (k, v) in kwargs
         if v ∉ range
