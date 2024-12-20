@@ -87,7 +87,7 @@ julia> gzipped_data = encode(e, data)
 #### Requirements for `encode` to work
 `encode` will throw an error if the following conditions aren't met.
 
-1. The input data is stored contiguous memory.
+1. The input data is stored in contiguous memory.
 1. The input length is in `ChunkCodecCore.decoded_size_range(e)`
 
 For example:
