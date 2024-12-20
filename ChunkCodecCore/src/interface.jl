@@ -2,7 +2,10 @@
     encode(e, src::AbstractVector{UInt8})::Vector{UInt8}
 
 Encode the input vector `src` using `e`.
-`e` must implement `try_encode!`, `decoded_size_range`, and `encoded_bound` like `EncodeOptions`.
+`e` must implement [`decoded_size_range`](@ref),
+[`encoded_bound`](@ref), and [`try_encode!`](@ref).
+
+See also [`EncodeOptions`](@ref).
 """
 function encode(e, src::AbstractVector{UInt8})::Vector{UInt8}
     src_size::Int64 = length(src)
@@ -17,32 +20,35 @@ function encode(e, src::AbstractVector{UInt8})::Vector{UInt8}
 end
 
 """
-    decode(d, src::AbstractVector{UInt8}; max_size::Int64=typemax(Int64), size_hint::Int64=Int64(0))::Vector{UInt8}
+    decode(d, src::AbstractVector{UInt8}; max_size::Integer=typemax(Int64), size_hint::Integer=Int64(0))::Vector{UInt8}
 
-Decode the input vector `src` using `d`.
-`d` must implement `try_decode!`, `try_find_decoded_size`, and optionally `try_resize_decode!`.
+Decode the input data `src` using `d`.
+`d` must implement [`try_find_decoded_size`](@ref), [`try_decode!`](@ref), and optionally [`try_resize_decode!`](@ref).
 
-Throw a `DecodedSizeError` if decoding fails because the output size would be greater than `max_size`.
+Throw a [`DecodedSizeError`](@ref) if decoding fails because the output size would be greater than `max_size`.
 
-Throw a `DecodingError` if decoding fails because the input data is not valid.
+Throw a [`DecodingError`](@ref) if decoding fails because the input data is not valid.
 
 If you have a good idea of what the decoded size is, using the `size_hint` keyword argument
 can greatly improve performance.
+
+See also [`DecodeOptions`](@ref).
 """
 function decode(
         d,
         src::AbstractVector{UInt8};
-        max_size::Int64=typemax(Int64),
-        size_hint::Int64=Int64(0),
+        max_size::Integer=typemax(Int64),
+        size_hint::Integer=Int64(0),
     )::Vector{UInt8}
-    _norm_size_hint = min(size_hint, max_size)
-    dst = zeros(UInt8, _norm_size_hint)
-    real_dst_size = try_resize_decode!(d, dst, src; max_size=max_size)::Union{Nothing, Int64}
+    _clamp_max_size::Int64 = clamp(max_size, Int64(0), typemax(Int64))
+    _clamp_size_hint::Int64 = clamp(size_hint, Int64(0), _clamp_max_size)
+    dst = zeros(UInt8, _clamp_size_hint)
+    real_dst_size = try_resize_decode!(d, dst, src; max_size=_clamp_max_size)::Union{Nothing, Int64}
     if isnothing(real_dst_size)
-        throw(DecodedSizeError(max_size, try_find_decoded_size(d, src)))
+        throw(DecodedSizeError(_clamp_max_size, try_find_decoded_size(d, src)))
     end
     @assert !signbit(real_dst_size)
-    if real_dst_size < _norm_size_hint
+    if real_dst_size < _clamp_size_hint
         resize!(dst, real_dst_size)
     end
     @assert real_dst_size == length(dst)
@@ -60,9 +66,10 @@ function decode_options end
     can_concatenate(::Codec)::Bool
 
 Return `true` if the codec has concatenation transparency.
-If this is `true` the following should hold
-`D([E(x); E(y);]) == [x; y;]`
-Where `D` and `E` are the decode and encode functions, and `x` and `y` vectors of bytes.
+
+If `true`, and some encoded data `a` and `b` decode to `x` and `y`, then
+the concatenation of `a` and `b` will
+decode to the concatenation of `x` and `y`
 """
 can_concatenate(::Codec) = false
 
@@ -160,7 +167,7 @@ All of `dst` can be written to or used as scratch space by the decoder.
 Only the initial returned number of bytes are valid output.
 """
 function try_resize_decode!(d, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; max_size::Int64=typemax(Int64), kwargs...)::Union{Nothing, Int64}
-    max_size ≥ length(dst) || throw(ArgumentError("`max_size`: $(max_size) must be at least `length(dst)`: $(length(dst))"))
+    check_in_range(Int64(0):max_size; dst_size=length(dst))
     olb::Int64 = length(dst)
     real_dst_size::Int64 = -1
     decoded_size = try_find_decoded_size(d, src)::Union{Nothing, Int64}

@@ -99,7 +99,7 @@ function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
         if s > 0
             dst = zeros(UInt8, s - 1)
             @test_throws(
-                ArgumentError("`max_size`: $(-1) must be at least `length(dst)`: $(s-1)"),
+                ArgumentError("dst_size ∈ $(0:-1) must hold. Got\ndst_size => $(s-1)"),
                 try_resize_decode!(d, dst, encoded; max_size=Int64(-1))
             )
             dst = zeros(UInt8, s - 1)
@@ -119,7 +119,7 @@ function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
         dst_buffer = zeros(UInt8, s + 2)
         dst = view(dst_buffer, 1:s+1)
         @test_throws(
-            ArgumentError("`max_size`: $(s) must be at least `length(dst)`: $(s+1)"),
+            ArgumentError("dst_size ∈ $(0:s) must hold. Got\ndst_size => $(s+1)"),
             try_resize_decode!(d, dst, encoded; max_size=s),
         )
         @test try_resize_decode!(d, dst, encoded; max_size=s+2) === s

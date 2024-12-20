@@ -47,7 +47,7 @@ function try_decode!(d::BZ2DecodeOptions, dst::AbstractVector{UInt8}, src::Abstr
 end
 
 function try_resize_decode!(d::BZ2DecodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; max_size::Int64=typemax(Int64), kwargs...)::Union{Nothing, Int64}
-    max_size ≥ length(dst) || throw(ArgumentError("`max_size`: $(max_size) must be at least `length(dst)`: $(length(dst))"))
+    check_in_range(Int64(0):max_size; dst_size=length(dst))
     olb::Int64 = length(dst)
     dst_size::Int64 = olb
     src_size::Int64 = length(src)

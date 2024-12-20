@@ -6,6 +6,7 @@ Generic error for data that cannot be decoded.
 abstract type DecodingError <: Exception end
 
 """
+    struct DecodedSizeError <: Exception
     DecodedSizeError(max_size, decoded_size)
 
 Unable to decode the data because the decoded size is larger than `max_size`
