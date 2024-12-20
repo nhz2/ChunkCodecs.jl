@@ -58,4 +58,7 @@ end
     @test decode(d, ones(UInt8, Int64(100)); size_hint=Int64(99)) == ones(UInt8, Int64(100))
     @test decode(d, ones(UInt8, Int64(100)); size_hint=Int64(99), max_size=Int64(100)) == ones(UInt8, Int64(100))
     @test_throws DecodedSizeError decode(d, ones(UInt8, Int64(100)); size_hint=Int64(200), max_size=Int64(99))
+    # negative max_size
+    @test_throws DecodedSizeError(Int64(-1), nothing) decode(d, ones(UInt8, Int64(100)); max_size=Int64(-1))
+    @test_throws DecodedSizeError(typemin(Int64), nothing) decode(d, ones(UInt8, Int64(100)); max_size=typemin(Int128))
 end

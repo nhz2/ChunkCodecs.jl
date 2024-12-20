@@ -40,7 +40,10 @@ function decode(
         max_size::Integer=typemax(Int64),
         size_hint::Integer=Int64(0),
     )::Vector{UInt8}
-    _clamp_max_size::Int64 = clamp(max_size, Int64(0), typemax(Int64))
+    _clamp_max_size::Int64 = clamp(max_size, Int64)
+    if _clamp_max_size < Int64(0)
+        throw(DecodedSizeError(_clamp_max_size, nothing))
+    end
     _clamp_size_hint::Int64 = clamp(size_hint, Int64(0), _clamp_max_size)
     dst = zeros(UInt8, _clamp_size_hint)
     real_dst_size = try_resize_decode!(d, dst, src; max_size=_clamp_max_size)::Union{Nothing, Int64}
