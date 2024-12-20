@@ -1,11 +1,11 @@
-using ChunkCodecCore: encoded_bound, decoded_size_range, encode, decode, DecodedSizeError
+using ChunkCodecCore: encode_bound, decoded_size_range, encode, decode, DecodedSizeError
 using ChunkCodecLibLz4
 using ChunkCodecTests: test_codec
 using Test: @testset, @test_throws, @test
 
 @testset "encode_bound" begin
     local a = last(decoded_size_range(LZ4BlockEncodeOptions()))
-    @test encoded_bound(LZ4BlockEncodeOptions(), a) > a
+    @test encode_bound(LZ4BlockEncodeOptions(), a) > a
 end
 @testset "default" begin
     test_codec(LZ4BlockCodec(), LZ4BlockEncodeOptions(), LZ4BlockDecodeOptions(); trials=100)

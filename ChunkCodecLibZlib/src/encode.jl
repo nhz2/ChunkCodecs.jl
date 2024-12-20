@@ -90,7 +90,7 @@ is_thread_safe(::_AllEncodeOptions) = true
 # Since the default gzip header, windowBits, and memLevel are always
 # used in this package, the code can be simplified.
 # If alternate settings are used this must be modified.
-function encoded_bound(e::_AllEncodeOptions, src_size::Int64)::Int64
+function encode_bound(e::_AllEncodeOptions, src_size::Int64)::Int64
     wraplen = _wraplen(e)
     Base.Checked.checked_add(
         src_size,
@@ -101,7 +101,7 @@ _wraplen(::ZlibEncodeOptions)    = Int64(6)
 _wraplen(::DeflateEncodeOptions) = Int64(0)
 _wraplen(::GzipEncodeOptions)    = Int64(18)
 
-# max to prevent overflows in encoded_bound
+# max to prevent overflows in encode_bound
 # From ChunkCodecTests.find_max_decoded_size(::EncodeOptions)
 max_decoded_size(::ZlibEncodeOptions)::Int64 = 0x7ff60087fa602c73
 max_decoded_size(::DeflateEncodeOptions)::Int64 = 0x7ff60087fa602c79

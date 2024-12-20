@@ -1,5 +1,5 @@
 using Random: Random
-using ChunkCodecCore: encoded_bound, decoded_size_range, encode, decode
+using ChunkCodecCore: encode_bound, decoded_size_range, encode, decode
 using ChunkCodecLibZlib:
     ChunkCodecLibZlib,
     ZlibCodec,
@@ -41,7 +41,7 @@ tests = [
 @testset "tests for $(codec)" for (codec, encode_opt, decode_opt) in tests
     @testset "encode_bound" begin
         local a = last(decoded_size_range(encode_opt()))
-        @test encoded_bound(encode_opt(), a) == typemax(Int64)
+        @test encode_bound(encode_opt(), a) == typemax(Int64)
     end
     @testset "default" begin
         test_codec(codec(), encode_opt(), decode_opt(); trials=50)

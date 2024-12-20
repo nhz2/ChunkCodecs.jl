@@ -9,7 +9,7 @@ using ChunkCodecCore:
     can_concatenate,
     decode_options,
     decoded_size_range,
-    encoded_bound,
+    encode_bound,
     encode,
     decode,
     DecodedSizeError,
@@ -38,8 +38,8 @@ function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
     @test last(srange) != typemax(Int64) # avoid length overflow
 
     for s in [first(srange):step(srange):min(last(srange), 1000); rand(srange, 10000); last(srange)]
-        @test encoded_bound(e, s) isa Int64
-        @test encoded_bound(e, s) ≥ s
+        @test encode_bound(e, s) isa Int64
+        @test encode_bound(e, s) ≥ s
     end
 
     # round trip tests
@@ -59,7 +59,7 @@ function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
         elseif choice == 4
             rand(0x00:0x0f, s)
         end
-        local e_bound = encoded_bound(e, s)
+        local e_bound = encode_bound(e, s)
         local encoded = encode(e, data)
         local buffer = rand(UInt8, max(length(encoded)+11, e_bound+11))
         local b_copy = copy(buffer)
@@ -161,7 +161,7 @@ function last_good_input(f)
 end
 
 function find_max_decoded_size(e::EncodeOptions)
-    last_good_input(x->encoded_bound(e, x))
+    last_good_input(x->encode_bound(e, x))
 end
 
 end # module ChunkCodecTests

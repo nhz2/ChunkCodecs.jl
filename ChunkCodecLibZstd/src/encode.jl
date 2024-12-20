@@ -37,13 +37,13 @@ function ZstdEncodeOptions(::ZstdCodec=ZstdCodec();
 end
 
 function decoded_size_range(::ZstdEncodeOptions)
-    # prevent overflow of encoded_bound
+    # prevent overflow of encode_bound
     # like ZSTD_MAX_INPUT_SIZE for Int64
     # From ChunkCodecTests.find_max_decoded_size(ZstdEncodeOptions())
     Int64(0):Int64(1):Int64(0x7F807F807F807F80)
 end
 
-function encoded_bound(::ZstdEncodeOptions, src_size::Int64)::Int64
+function encode_bound(::ZstdEncodeOptions, src_size::Int64)::Int64
     # ZSTD_COMPRESSBOUND ported to Julia
     # This also works when streaming
     # assuming no extra flushes

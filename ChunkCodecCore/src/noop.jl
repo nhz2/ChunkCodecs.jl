@@ -22,7 +22,7 @@ is_thread_safe(::NoopEncodeOptions) = true
 
 decoded_size_range(::NoopEncodeOptions) = Int64(0):Int64(1):typemax(Int64)-Int64(1)
 
-encoded_bound(::NoopEncodeOptions, src_size::Int64)::Int64 = src_size
+encode_bound(::NoopEncodeOptions, src_size::Int64)::Int64 = src_size
 
 function try_encode!(e::NoopEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
     dst_size::Int64 = length(dst)

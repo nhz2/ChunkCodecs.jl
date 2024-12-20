@@ -3,7 +3,7 @@
 
 Encode the input vector `src` using encoder `e`.
 `e` must implement [`decoded_size_range`](@ref),
-[`encoded_bound`](@ref), and [`try_encode!`](@ref).
+[`encode_bound`](@ref), and [`try_encode!`](@ref).
 
 Throw an error if `length(src)` is not in `decoded_size_range(e)`
 
@@ -14,7 +14,7 @@ See also [`EncodeOptions`](@ref).
 function encode(e, src::AbstractVector{UInt8})::Vector{UInt8}
     src_size::Int64 = length(src)
     check_in_range(decoded_size_range(e); src_size)
-    dst_size::Int64 = encoded_bound(e, src_size)
+    dst_size::Int64 = encode_bound(e, src_size)
     @assert !signbit(dst_size)
     dst = Vector{UInt8}(undef, dst_size)
     real_dst_size = something(try_encode!(e, dst, src))
@@ -94,18 +94,18 @@ function codec end
     decoded_size_range(e)::StepRange{Int64, Int64}
 
 Return the range of allowed `src` sizes for encoding.
-[`encoded_bound`](@ref) must not overflow for any `src_size` in this range.
+[`encode_bound`](@ref) must not overflow for any `src_size` in this range.
 """
 function decoded_size_range end
 
 """
-    encoded_bound(e, src_size::Int64)::Int64
+    encode_bound(e, src_size::Int64)::Int64
 
 Return the size of `dst` required to ensure [`try_encode!`](@ref) succeeds regardless of `src`'s content.
 
 Precondition: `src_size` is in [`decoded_size_range(e)`](@ref)
 """
-function encoded_bound end
+function encode_bound end
 
 """
     try_encode!(e, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
@@ -125,7 +125,7 @@ Precondition: `dst` and `src` do not overlap in memory.
 All of `dst` can be written to or used as scratch space by the encoder.
 Only the initial returned number of bytes are valid output.
 
-See also [`encoded_bound`](@ref) and [`decoded_size_range`](@ref)
+See also [`encode_bound`](@ref) and [`decoded_size_range`](@ref)
 """
 function try_encode! end
 

@@ -19,7 +19,7 @@ Options for encoding data.
 Required methods for a type `T <: EncodeOptions` to implement:
 - `codec(::T)::Codec`
 - `decoded_size_range(::T)::StepRange{Int64, Int64}`
-- `encoded_bound(::T, src_size::Int64)::Int64`
+- `encode_bound(::T, src_size::Int64)::Int64`
 - `try_encode!(::T, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}`
 
 Optional methods to implement:

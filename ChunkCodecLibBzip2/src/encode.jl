@@ -27,7 +27,7 @@ function BZ2EncodeOptions(::BZ2Codec=BZ2Codec();
 end
 
 function decoded_size_range(::BZ2EncodeOptions)
-    # prevent overflow of encoded_bound
+    # prevent overflow of encode_bound
     Int64(0):Int64(1):Int64(0x7e07_e07e_07e0_7bb8)
 end
 
@@ -35,7 +35,7 @@ end
 # "To guarantee that the compressed data will fit in its buffer,
 # allocate an output buffer of size 1% larger than the uncompressed data,
 # plus six hundred extra bytes."
-encoded_bound(::BZ2EncodeOptions, src_size::Int64)::Int64 = Base.Checked.checked_add(src_size, src_size>>6 + Int64(601))
+encode_bound(::BZ2EncodeOptions, src_size::Int64)::Int64 = Base.Checked.checked_add(src_size, src_size>>6 + Int64(601))
 
 function try_encode!(e::BZ2EncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
     check_contiguous(dst)

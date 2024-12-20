@@ -14,7 +14,7 @@ import ChunkCodecCore:
     decode_options,
     try_decode!,
     try_encode!,
-    encoded_bound,
+    encode_bound,
     try_find_decoded_size,
     decoded_size_range
 

@@ -12,7 +12,7 @@ public DecodedSizeError
 public decode_options
 
 public decoded_size_range
-public encoded_bound
+public encode_bound
 public try_encode!
 
 public try_find_decoded_size

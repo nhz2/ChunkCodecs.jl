@@ -1,5 +1,5 @@
 using Random: Random
-using ChunkCodecCore: encoded_bound, decoded_size_range, encode, decode
+using ChunkCodecCore: encode_bound, decoded_size_range, encode, decode
 using ChunkCodecLibZstd:
     ChunkCodecLibZstd,
     ZstdCodec,
@@ -15,7 +15,7 @@ Aqua.test_all(ChunkCodecLibZstd)
 Random.seed!(1234)
 @testset "encode_bound" begin
     local a = last(decoded_size_range(ZstdEncodeOptions()))
-    @test encoded_bound(ZstdEncodeOptions(), a) == typemax(Int64)
+    @test encode_bound(ZstdEncodeOptions(), a) == typemax(Int64)
 end
 @testset "default" begin
     test_codec(ZstdCodec(), ZstdEncodeOptions(), ZstdDecodeOptions(); trials=100)

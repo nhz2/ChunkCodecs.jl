@@ -67,7 +67,7 @@ function _preferences(e::LZ4FrameEncodeOptions)::LZ4F_preferences_t
 end
 
 function decoded_size_range(::LZ4FrameEncodeOptions)
-    # prevent overflow of encoded_bound
+    # prevent overflow of encode_bound
     # This should be very conservative
     max_size = if sizeof(Csize_t) == 8
         Int64(2)^47 - Int64(2)
@@ -79,7 +79,7 @@ function decoded_size_range(::LZ4FrameEncodeOptions)
     Int64(0):Int64(1):max_size
 end
 
-function encoded_bound(e::LZ4FrameEncodeOptions, src_size::Int64)::Int64
+function encode_bound(e::LZ4FrameEncodeOptions, src_size::Int64)::Int64
     LZ4F_compressFrameBound(Csize_t(src_size), _preferences(e))
 end
 
@@ -90,7 +90,7 @@ function try_encode!(e::LZ4FrameEncodeOptions, dst::AbstractVector{UInt8}, src::
     dst_size::Int64 = length(dst)
     check_in_range(decoded_size_range(e); src_size)
     # LZ4F_compressFrame needs this to hold.
-    if dst_size < encoded_bound(e, src_size)
+    if dst_size < encode_bound(e, src_size)
         return nothing
     end
     ret = LZ4F_compressFrame(dst, src, _preferences(e))
@@ -131,7 +131,7 @@ end
 
 decoded_size_range(::LZ4BlockEncodeOptions) = Int64(0):Int64(1):LZ4_MAX_INPUT_SIZE
 
-function encoded_bound(::LZ4BlockEncodeOptions, src_size::Int64)::Int64
+function encode_bound(::LZ4BlockEncodeOptions, src_size::Int64)::Int64
     # from LZ4_COMPRESSBOUND in lz4.h
     if src_size > LZ4_MAX_INPUT_SIZE
         throw(OverflowError("$(src_size) must be at most $(LZ4_MAX_INPUT_SIZE)"))
@@ -204,8 +204,8 @@ end
 
 decoded_size_range(e::LZ4ZarrEncodeOptions) = Int64(0):Int64(1):min(last(decoded_size_range(e.block_options)), Int64(typemax(Int32)))
 
-function encoded_bound(e::LZ4ZarrEncodeOptions, src_size::Int64)::Int64
-    Base.Checked.checked_add(encoded_bound(e.block_options, src_size), Int64(4))
+function encode_bound(e::LZ4ZarrEncodeOptions, src_size::Int64)::Int64
+    Base.Checked.checked_add(encode_bound(e.block_options, src_size), Int64(4))
 end
 
 function try_encode!(e::LZ4ZarrEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}

@@ -1,5 +1,5 @@
 using Random: Random
-using ChunkCodecCore: encoded_bound, decoded_size_range, encode, decode
+using ChunkCodecCore: encode_bound, decoded_size_range, encode, decode
 using ChunkCodecLibBzip2:
     ChunkCodecLibBzip2,
     BZ2Codec,
@@ -15,7 +15,7 @@ Aqua.test_all(ChunkCodecLibBzip2)
 Random.seed!(1234)
 @testset "encode_bound" begin
     local a = last(decoded_size_range(BZ2EncodeOptions()))
-    @test encoded_bound(BZ2EncodeOptions(), a) == typemax(Int64)
+    @test encode_bound(BZ2EncodeOptions(), a) == typemax(Int64)
 end
 @testset "default" begin
     test_codec(BZ2Codec(), BZ2EncodeOptions(), BZ2DecodeOptions(); trials=50)
