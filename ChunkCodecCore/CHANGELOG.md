@@ -6,4 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+
+## [v0.2.0](https://github.com/nhz2/ChunkCodecs.jl/tree/ChunkCodecCore-v0.2.0) - 2024-12-20
+
+### Added
+
 - Initial release
