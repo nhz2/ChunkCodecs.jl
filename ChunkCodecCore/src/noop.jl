@@ -1,14 +1,23 @@
 # The Noop codec
 
 """
-    NoopCodec <: Codec
+    struct NoopCodec <: Codec
+    NoopCodec()
 
-This codec just copies the input as is.
+This codec copies the input.
+
+See also [`NoopEncodeOptions`](@ref) and [`NoopDecodeOptions`](@ref)
 """
 struct NoopCodec <: Codec end
 can_concatenate(::NoopCodec) = true
 decode_options(::NoopCodec) = NoopDecodeOptions() # default decode options
 
+"""
+    struct NoopEncodeOptions <: EncodeOptions
+    NoopEncodeOptions(::NoopCodec=NoopCodec(); kwargs...)
+
+Copies the input.
+"""
 struct NoopEncodeOptions <: EncodeOptions
     function NoopEncodeOptions(::NoopCodec=NoopCodec();
             kwargs...
@@ -36,6 +45,12 @@ function try_encode!(e::NoopEncodeOptions, dst::AbstractVector{UInt8}, src::Abst
     end
 end
 
+"""
+    struct NoopDecodeOptions <: DecodeOptions
+    NoopDecodeOptions(::NoopCodec=NoopCodec(); kwargs...)
+
+Copies the input.
+"""
 struct NoopDecodeOptions <: DecodeOptions
     function NoopDecodeOptions(::NoopCodec=NoopCodec();
             kwargs...

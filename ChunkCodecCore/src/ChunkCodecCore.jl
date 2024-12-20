@@ -25,6 +25,10 @@ public can_concatenate
 public is_thread_safe
 public try_resize_decode!
 
+public NoopCodec
+public NoopEncodeOptions
+public NoopDecodeOptions
+
 include("types.jl")
 include("errors.jl")
 include("interface.jl")
