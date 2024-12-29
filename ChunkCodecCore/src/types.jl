@@ -40,6 +40,6 @@ Required methods for a type `T <: DecodeOptions` to implement:
 
 Optional methods to implement:
 - `is_thread_safe(::T)::Bool`: defaults to `false`.
-- `try_resize_decode!(::T, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; max_size::Int64=typemax(Int64), kwargs...)::Union{Nothing, Int64}`: defaults to using `try_decode!` and `try_find_decoded_size`
+- `try_resize_decode!(::T, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}, max_size::Int64; kwargs...)::Union{Nothing, Int64}`: defaults to using `try_decode!` and `try_find_decoded_size`
 """
 abstract type DecodeOptions end

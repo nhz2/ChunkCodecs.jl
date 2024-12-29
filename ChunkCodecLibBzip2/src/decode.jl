@@ -43,10 +43,10 @@ function try_find_decoded_size(::BZ2DecodeOptions, src::AbstractVector{UInt8})::
 end
 
 function try_decode!(d::BZ2DecodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
-    try_resize_decode!(d, dst, src; max_size=Int64(length(dst)))
+    try_resize_decode!(d, dst, src, Int64(length(dst)))
 end
 
-function try_resize_decode!(d::BZ2DecodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; max_size::Int64=typemax(Int64), kwargs...)::Union{Nothing, Int64}
+function try_resize_decode!(d::BZ2DecodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}, max_size::Int64; kwargs...)::Union{Nothing, Int64}
     check_in_range(Int64(0):max_size; dst_size=length(dst))
     olb::Int64 = length(dst)
     dst_size::Int64 = olb

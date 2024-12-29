@@ -1,5 +1,6 @@
 using PythonCall
 using ChunkCodecs
+using ChunkCodecTests: rand_test_data
 using Test
 
 codecs = [
@@ -28,17 +29,7 @@ codecs = [
         im_dec(x) = pyconvert(Vector, im_dec_funct(x; out=zeros(UInt8, s), im_options[2]...))
         jl_dec(x) = decode(codec(jl_options), x; size_hint=s)
         jl_enc(x) = encode(jl_options, x)
-        # generate data
-        local choice = rand(1:4)
-        local data = if choice == 1
-            rand(UInt8, s)
-        elseif choice == 2
-            zeros(UInt8, s)
-        elseif choice == 3
-            ones(UInt8, s)
-        elseif choice == 4
-            rand(0x00:0x0f, s)
-        end
+        local data = rand_test_data(s)
         has_encode, has_decode = if length(im_options) ≤ 2
             true, true
         else
