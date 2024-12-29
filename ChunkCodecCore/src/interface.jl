@@ -52,7 +52,7 @@ function decode(
     end
     _clamp_size_hint::Int64 = clamp(size_hint, Int64(0), _clamp_max_size)
     dst = zeros(UInt8, _clamp_size_hint)
-    real_dst_size = try_resize_decode!(d, dst, src; max_size=_clamp_max_size)::Union{Nothing, Int64}
+    real_dst_size = try_resize_decode!(d, dst, src, _clamp_max_size)::Union{Nothing, Int64}
     if isnothing(real_dst_size)
         throw(DecodedSizeError(_clamp_max_size, try_find_decoded_size(d, src)))
     end
@@ -173,7 +173,7 @@ Only the initial returned number of bytes are valid output.
 function try_decode! end
 
 """
-    try_resize_decode!(d, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; max_size::Int64=typemax(Int64), kwargs...)::Union{Nothing, Int64}
+    try_resize_decode!(d, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}, max_size::Int64; kwargs...)::Union{Nothing, Int64}
 
 Try to decode the input `src` into `dst` using decoder `d`.
 
@@ -191,7 +191,7 @@ Precondition: `dst` and `src` do not overlap in memory.
 All of `dst` can be written to or used as scratch space by the decoder.
 Only the initial returned number of bytes are valid output.
 """
-function try_resize_decode!(d, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; max_size::Int64=typemax(Int64), kwargs...)::Union{Nothing, Int64}
+function try_resize_decode!(d, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}, max_size::Int64; kwargs...)::Union{Nothing, Int64}
     check_in_range(Int64(0):max_size; dst_size=length(dst))
     olb::Int64 = length(dst)
     real_dst_size::Int64 = -1
@@ -239,7 +239,7 @@ end
 # allow passing codec to decode
 try_find_decoded_size(c::Codec, src::AbstractVector{UInt8}) = try_find_decoded_size(decode_options(c), src)
 try_decode!(c::Codec, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...) = try_decode!(decode_options(c), dst, src; kwargs...)
-try_resize_decode!(c::Codec, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...) = try_resize_decode!(decode_options(c), dst, src;  kwargs...)
+try_resize_decode!(c::Codec, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}, max_size::Int64; kwargs...) = try_resize_decode!(decode_options(c), dst, src, max_size; kwargs...)
 
 """
     check_contiguous(x::AbstractVector{UInt8})

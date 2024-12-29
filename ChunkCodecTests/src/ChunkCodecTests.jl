@@ -104,29 +104,29 @@ function test_encoder_decoder(e, d; trials=100)
             dst = zeros(UInt8, s - 1)
             @test_throws(
                 ArgumentError("dst_size ∈ $(0:-1) must hold. Got\ndst_size => $(s-1)"),
-                try_resize_decode!(d, dst, encoded; max_size=Int64(-1))
+                try_resize_decode!(d, dst, encoded, Int64(-1))
             )
             dst = zeros(UInt8, s - 1)
-            @test try_resize_decode!(d, dst, encoded; max_size=s) == s
+            @test try_resize_decode!(d, dst, encoded, s) == s
             @test length(dst) == s
             @test dst == data
             dst = UInt8[]
-            @test isnothing(try_resize_decode!(d, dst, encoded; max_size=Int64(0)))
+            @test isnothing(try_resize_decode!(d, dst, encoded, Int64(0)))
         end
         if s > 1
             dst = UInt8[]
-            @test isnothing(try_resize_decode!(d, dst, encoded; max_size=Int64(1)))
+            @test isnothing(try_resize_decode!(d, dst, encoded, Int64(1)))
             dst = UInt8[0x01]
-            @test isnothing(try_resize_decode!(d, dst, encoded; max_size=Int64(1)))
+            @test isnothing(try_resize_decode!(d, dst, encoded, Int64(1)))
             @test_throws DecodedSizeError(1, try_find_decoded_size(d, encoded)) decode(d, encoded; max_size=Int64(1))
         end
         dst_buffer = zeros(UInt8, s + 2)
         dst = view(dst_buffer, 1:s+1)
         @test_throws(
             ArgumentError("dst_size ∈ $(0:s) must hold. Got\ndst_size => $(s+1)"),
-            try_resize_decode!(d, dst, encoded; max_size=s),
+            try_resize_decode!(d, dst, encoded, s),
         )
-        @test try_resize_decode!(d, dst, encoded; max_size=s+2) === s
+        @test try_resize_decode!(d, dst, encoded, s+2) === s
         @test length(dst) == s + 1
         @test dst[1:s] == data
         @test dst_buffer[end] == 0x00
