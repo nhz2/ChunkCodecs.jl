@@ -1,6 +1,9 @@
 using Random: Random
-using ChunkCodecCore: ChunkCodecCore, NoopCodec, NoopEncodeOptions, NoopDecodeOptions, DecodedSizeError, decode
-using ChunkCodecTests: test_codec
+using ChunkCodecCore:
+    ChunkCodecCore,
+    NoopCodec, NoopEncodeOptions, NoopDecodeOptions,
+    DecodedSizeError, decode
+using ChunkCodecTests: test_codec, test_encoder_decoder
 using Aqua: Aqua
 using Test: @test, @testset, @test_throws
 
@@ -10,6 +13,8 @@ Random.seed!(1234)
 
 @testset "noop codec" begin
     test_codec(NoopCodec(), NoopEncodeOptions(), NoopDecodeOptions(); trials=100)
+    # codec can be used as decoder
+    test_encoder_decoder(NoopEncodeOptions(), NoopCodec(); trials=20)
 end
 @testset "errors" begin
     @test sprint(Base.showerror, DecodedSizeError(1, 2)) == "DecodedSizeError: decoded size: 2 is greater than max size: 1"

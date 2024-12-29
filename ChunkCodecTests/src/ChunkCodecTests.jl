@@ -20,15 +20,29 @@ using ChunkCodecCore:
 
 using Test: Test, @test, @test_throws
 
-export test_codec
+export test_codec, test_encoder_decoder, rand_test_data
 
 function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
     @test decode_options(c) isa DecodeOptions
+    @test can_concatenate(c) isa Bool
     @test codec(e) == c
     @test codec(d) == c
     @test is_thread_safe(e) isa Bool
     @test is_thread_safe(d) isa Bool
 
+    test_encoder_decoder(e, d; trials)
+
+    # can_concatenate tests
+    if can_concatenate(c)
+        srange = decoded_size_range(e)
+        a = rand(UInt8, 100*step(srange))
+        b = rand(UInt8, 200*step(srange))
+        @test decode(d, [encode(e, a); encode(e, b);]) == [a; b;]
+        @test decode(d, [encode(e, UInt8[]); encode(e, UInt8[]);]) == UInt8[]
+    end
+end
+
+function test_encoder_decoder(e, d; trials=100)
     @test decoded_size_range(e) isa StepRange{Int64, Int64}
 
     srange = decoded_size_range(e)
@@ -48,17 +62,7 @@ function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
         rand(first(srange):step(srange):min(last(srange), 2000000), trials);
     ]
     for s in decoded_sizes
-        # generate data
-        local choice = rand(1:4)
-        local data = if choice == 1
-            rand(UInt8, s)
-        elseif choice == 2
-            zeros(UInt8, s)
-        elseif choice == 3
-            ones(UInt8, s)
-        elseif choice == 4
-            rand(0x00:0x0f, s)
-        end
+        local data = rand_test_data(s)
         local e_bound = encode_bound(e, s)
         local encoded = encode(e, data)
         local buffer = rand(UInt8, max(length(encoded)+11, e_bound+11))
@@ -129,13 +133,18 @@ function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
 
         @test decode(d, encoded) == data
     end
+end
 
-    # can_concatenate tests
-    if can_concatenate(c)
-        a = rand(UInt8, 100*step(srange))
-        b = rand(UInt8, 200*step(srange))
-        @test decode(d, [encode(e, a); encode(e, b);]) == [a; b;]
-        @test decode(d, [encode(e, UInt8[]); encode(e, UInt8[]);]) == UInt8[]
+function rand_test_data(s::Int64)::Vector{UInt8}
+    choice = rand(1:4)
+    if choice == 1
+        rand(UInt8, s)
+    elseif choice == 2
+        zeros(UInt8, s)
+    elseif choice == 3
+        ones(UInt8, s)
+    elseif choice == 4
+        rand(0x00:0x0f, s)
     end
 end
 
