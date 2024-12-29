@@ -12,5 +12,5 @@ ChunkCodecCore = {path = "../ChunkCodecCore"}
 
 [compat]
 Bzip2_jll = "1"
-ChunkCodecCore = "0.1"
+ChunkCodecCore = "0.2"
 julia = "1.11"
