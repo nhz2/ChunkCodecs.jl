@@ -92,7 +92,7 @@ end
 
 const H5_TEST_HEADER_SIZE = 2048
 
-# I don't think this a a proper hdf5 file, but it is useful for testing purposes
+# I don't think this a proper hdf5 file, but it is useful for testing purposes
 function make_hdf5(chunk::Vector{UInt8}, data_size::Integer, filter_ids::Vector{UInt16}, client_datas::Vector{Vector{UInt32}})
     chunk_size = length(chunk)
     @assert length(filter_ids) == length(client_datas)
@@ -176,6 +176,7 @@ function make_hdf5(chunk::Vector{UInt8}, data_size::Integer, filter_ids::Vector{
         le(0x0008); # Size of Header Message #3 Data
         le(UInt32(1)); # Header Message #3 Flags
         0x02; # Version
+        # I don't think these flags are correct.
         0x03; # Space Allocation Time
         0x02; # Fill Value Write Time
         0x00; # Fill Value Defined
@@ -195,10 +196,14 @@ function make_hdf5(chunk::Vector{UInt8}, data_size::Integer, filter_ids::Vector{
         0x04; # Version
         0x02; # Layout Class, Chunked Storage
         0x03; # Flags, A filtered chunk for Single Chunk indexing.
+        # Dimensionality needs to be set to 2 for some reason
+        # even though there is only one dimension.
+        # I figured this out by looking at JLD2.jl source code.
         0x02; # Dimensionality
         0x08; # Dimension Size Encoded Length
         le(UInt64(data_size)); #  the dimension 1 size of a single chunk, in units of array elements
-        le(UInt64(1));
+        le(UInt64(1)); # I don't know why this needed but I think it
+        # is related to the additional dimension
         0x01; # Chunk Indexing Type, Single Chunk
         le(UInt64(chunk_size)); # size of filtered chunk
         le(UInt32(0)); # Enabled filters
