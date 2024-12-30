@@ -29,9 +29,14 @@ public NoopCodec
 public NoopEncodeOptions
 public NoopDecodeOptions
 
+public ShuffleCodec
+public ShuffleEncodeOptions
+public ShuffleDecodeOptions
+
 include("types.jl")
 include("errors.jl")
 include("interface.jl")
 include("noop.jl")
+include("shuffle.jl")
 
 end
