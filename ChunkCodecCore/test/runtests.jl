@@ -2,6 +2,7 @@ using Random: Random
 using ChunkCodecCore:
     ChunkCodecCore,
     NoopCodec, NoopEncodeOptions, NoopDecodeOptions,
+    ShuffleCodec, ShuffleEncodeOptions, ShuffleDecodeOptions,
     DecodedSizeError, decode
 using ChunkCodecTests: test_codec, test_encoder_decoder
 using Aqua: Aqua
@@ -15,6 +16,24 @@ Random.seed!(1234)
     test_codec(NoopCodec(), NoopEncodeOptions(), NoopDecodeOptions(); trials=100)
     # codec can be used as decoder
     test_encoder_decoder(NoopEncodeOptions(), NoopCodec(); trials=20)
+end
+@testset "shuffle codec" begin
+    for element_size in [1:10; typemax(Int64); typemax(Int64)-1;]
+        c = ShuffleCodec(element_size)
+        test_codec(
+            c,
+            ShuffleEncodeOptions(c),
+            ShuffleDecodeOptions(c);
+            trials=20,
+        )
+    end
+    c = ShuffleCodec(8)
+    # ShuffleCodec can be used as an encoder and decoder
+    test_encoder_decoder(c, c; trials=20)
+    # negative or zero element size should error
+    @test_throws ArgumentError ShuffleCodec(0)
+    @test_throws ArgumentError ShuffleCodec(-1)
+    @test_throws ArgumentError ShuffleCodec(typemin(Int64))
 end
 @testset "errors" begin
     @test sprint(Base.showerror, DecodedSizeError(1, 2)) == "DecodedSizeError: decoded size: 2 is greater than max size: 1"
