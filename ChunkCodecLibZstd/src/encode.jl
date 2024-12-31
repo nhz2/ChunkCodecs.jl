@@ -40,10 +40,13 @@ function decoded_size_range(::ZstdEncodeOptions)
     # prevent overflow of encode_bound
     # like ZSTD_MAX_INPUT_SIZE for Int64
     # From ChunkCodecTests.find_max_decoded_size(ZstdEncodeOptions())
-    Int64(0):Int64(1):Int64(0x7F807F807F807F80)
+    Int64(0):Int64(1):Int64(0x7F807F807F807F7F)
 end
 
 function encode_bound(::ZstdEncodeOptions, src_size::Int64)::Int64
+    if src_size < 0
+        return Int64(-1)
+    end
     # ZSTD_COMPRESSBOUND ported to Julia
     # This also works when streaming
     # assuming no extra flushes
@@ -58,10 +61,7 @@ function encode_bound(::ZstdEncodeOptions, src_size::Int64)::Int64
     else 
         Int64(0)
     end::Int64
-    Base.Checked.checked_add(
-        src_size,
-        src_size>>8 + margin,
-    )
+    return clamp(widen(src_size) + widen(src_size>>8 + margin), Int64)
 end
 
 function try_encode!(e::ZstdEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}

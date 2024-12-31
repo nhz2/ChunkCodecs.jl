@@ -94,16 +94,22 @@ function codec end
     decoded_size_range(e)::StepRange{Int64, Int64}
 
 Return the range of allowed `src` sizes for encoding.
-[`encode_bound`](@ref) must not overflow for any `src_size` in this range.
+
+[`encode_bound`](@ref) on any value in the returned range must be in
+`0:typemax(Int64)-1`.
+
+See also [`encode_bound`](@ref)
 """
 function decoded_size_range end
 
 """
     encode_bound(e, src_size::Int64)::Int64
 
-Return the size of `dst` required to ensure [`try_encode!`](@ref) succeeds regardless of `src`'s content.
+Return the size of `dst` required to ensure [`try_encode!`](@ref)
+succeeds regardless of `src`'s content if `src_size` is also in
+[`decoded_size_range(e)`](@ref) and there is enough memory.
 
-Precondition: `src_size` is in [`decoded_size_range(e)`](@ref)
+This function must not error and must be monotonically increasing over the domain of all `Int64`.
 """
 function encode_bound end
 

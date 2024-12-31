@@ -92,9 +92,10 @@ is_thread_safe(::_AllEncodeOptions) = true
 # If alternate settings are used this must be modified.
 function encode_bound(e::_AllEncodeOptions, src_size::Int64)::Int64
     wraplen = _wraplen(e)
-    Base.Checked.checked_add(
-        src_size,
-        src_size>>12 + src_size>>14 + src_size>>25 + Int64(7) + wraplen
+    clamp(
+        widen(src_size) +
+        widen(src_size>>12 + src_size>>14 + src_size>>25 + Int64(7) + wraplen),
+        Int64,
     )
 end
 _wraplen(::ZlibEncodeOptions)    = Int64(6)
@@ -103,9 +104,9 @@ _wraplen(::GzipEncodeOptions)    = Int64(18)
 
 # max to prevent overflows in encode_bound
 # From ChunkCodecTests.find_max_decoded_size(::EncodeOptions)
-max_decoded_size(::ZlibEncodeOptions)::Int64 = 0x7ff60087fa602c73
-max_decoded_size(::DeflateEncodeOptions)::Int64 = 0x7ff60087fa602c79
-max_decoded_size(::GzipEncodeOptions)::Int64 = 0x7ff60087fa602c67
+max_decoded_size(::ZlibEncodeOptions)::Int64 = 0x7ff60087fa602c72
+max_decoded_size(::DeflateEncodeOptions)::Int64 = 0x7ff60087fa602c78
+max_decoded_size(::GzipEncodeOptions)::Int64 = 0x7ff60087fa602c66
 
 decoded_size_range(e::_AllEncodeOptions) = Int64(0):Int64(1):max_decoded_size(e)
 
