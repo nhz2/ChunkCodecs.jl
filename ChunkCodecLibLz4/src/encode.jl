@@ -138,9 +138,7 @@ end
 decoded_size_range(::LZ4BlockEncodeOptions) = Int64(0):Int64(1):LZ4_MAX_INPUT_SIZE
 
 function encode_bound(e::LZ4BlockEncodeOptions, src_size::Int64)::Int64
-    if src_size < 0
-        Int64(-1)
-    elseif src_size > last(decoded_size_range(e))
+    if src_size > last(decoded_size_range(e))
         typemax(Int64)
     else
         # from LZ4_COMPRESSBOUND in lz4.h

@@ -44,9 +44,6 @@ function decoded_size_range(::ZstdEncodeOptions)
 end
 
 function encode_bound(::ZstdEncodeOptions, src_size::Int64)::Int64
-    if src_size < 0
-        return Int64(-1)
-    end
     # ZSTD_COMPRESSBOUND ported to Julia
     # This also works when streaming
     # assuming no extra flushes
@@ -61,7 +58,7 @@ function encode_bound(::ZstdEncodeOptions, src_size::Int64)::Int64
     else 
         Int64(0)
     end::Int64
-    return clamp(widen(src_size) + widen(src_size>>8 + margin), Int64)
+    clamp(widen(src_size) + widen(src_size>>8 + margin), Int64)
 end
 
 function try_encode!(e::ZstdEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}

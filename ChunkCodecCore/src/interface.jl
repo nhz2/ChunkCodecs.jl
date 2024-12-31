@@ -109,7 +109,7 @@ Return the size of `dst` required to ensure [`try_encode!`](@ref)
 succeeds regardless of `src`'s content if `src_size` is also in
 [`decoded_size_range(e)`](@ref) and there is enough memory.
 
-This function must not error and must be monotonically increasing over the domain of all `Int64`.
+On the domain of `0:typemax(Int64)` this function must not error and must be monotonically increasing.
 """
 function encode_bound end
 

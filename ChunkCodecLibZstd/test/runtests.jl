@@ -18,7 +18,7 @@ Random.seed!(1234)
     @test encode_bound(ZstdEncodeOptions(), a) == typemax(Int64) - 1
     # zstd has adds a margin to encode bound for sizes less than 128 KB
     # Ensure this doesn't break monotonicity
-    for i in 0:(Int64(128)<<10 + 100)
+    for i in 1:(Int64(128)<<10 + 100)
         @test encode_bound(ZstdEncodeOptions(), i) ≥ encode_bound(ZstdEncodeOptions(), i-1)
     end
 end
