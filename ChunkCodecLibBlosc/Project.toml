@@ -12,5 +12,5 @@ ChunkCodecCore = {path = "../ChunkCodecCore"}
 
 [compat]
 Blosc_jll = "1"
-ChunkCodecCore = "0.2"
+ChunkCodecCore = "0.3"
 julia = "1.11"
