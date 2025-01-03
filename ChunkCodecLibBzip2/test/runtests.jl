@@ -15,7 +15,7 @@ Aqua.test_all(ChunkCodecLibBzip2)
 Random.seed!(1234)
 @testset "encode_bound" begin
     local a = last(decoded_size_range(BZ2EncodeOptions()))
-    @test encode_bound(BZ2EncodeOptions(), a) == typemax(Int64)
+    @test encode_bound(BZ2EncodeOptions(), a) == typemax(Int64) - 1
 end
 @testset "default" begin
     test_codec(BZ2Codec(), BZ2EncodeOptions(), BZ2DecodeOptions(); trials=50)

@@ -80,7 +80,13 @@ function decoded_size_range(::LZ4FrameEncodeOptions)
 end
 
 function encode_bound(e::LZ4FrameEncodeOptions, src_size::Int64)::Int64
-    LZ4F_compressFrameBound(Csize_t(src_size), _preferences(e))
+    if src_size < 0
+        Int64(-1)
+    elseif src_size > last(decoded_size_range(e))
+        typemax(Int64)
+    else
+        LZ4F_compressFrameBound(Csize_t(src_size), _preferences(e))
+    end
 end
 
 function try_encode!(e::LZ4FrameEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
@@ -131,12 +137,13 @@ end
 
 decoded_size_range(::LZ4BlockEncodeOptions) = Int64(0):Int64(1):LZ4_MAX_INPUT_SIZE
 
-function encode_bound(::LZ4BlockEncodeOptions, src_size::Int64)::Int64
-    # from LZ4_COMPRESSBOUND in lz4.h
-    if src_size > LZ4_MAX_INPUT_SIZE
-        throw(OverflowError("$(src_size) must be at most $(LZ4_MAX_INPUT_SIZE)"))
+function encode_bound(e::LZ4BlockEncodeOptions, src_size::Int64)::Int64
+    if src_size > last(decoded_size_range(e))
+        typemax(Int64)
+    else
+        # from LZ4_COMPRESSBOUND in lz4.h
+        src_size + src_size÷Int64(255) + Int64(16)
     end
-    src_size + src_size÷Int64(255) + Int64(16)
 end
 
 function try_encode!(e::LZ4BlockEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
@@ -205,7 +212,7 @@ end
 decoded_size_range(e::LZ4ZarrEncodeOptions) = Int64(0):Int64(1):min(last(decoded_size_range(e.block_options)), Int64(typemax(Int32)))
 
 function encode_bound(e::LZ4ZarrEncodeOptions, src_size::Int64)::Int64
-    Base.Checked.checked_add(encode_bound(e.block_options, src_size), Int64(4))
+    clamp(widen(encode_bound(e.block_options, src_size)) + widen(Int64(4)), Int64)
 end
 
 function try_encode!(e::LZ4ZarrEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}

@@ -41,7 +41,7 @@ tests = [
 @testset "tests for $(codec)" for (codec, encode_opt, decode_opt) in tests
     @testset "encode_bound" begin
         local a = last(decoded_size_range(encode_opt()))
-        @test encode_bound(encode_opt(), a) == typemax(Int64)
+        @test encode_bound(encode_opt(), a) == typemax(Int64) - 1
     end
     @testset "default" begin
         test_codec(codec(), encode_opt(), decode_opt(); trials=50)
