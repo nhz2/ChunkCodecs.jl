@@ -21,7 +21,7 @@ ChunkCodecLibZstd = {path = "../ChunkCodecLibZstd"}
 
 [compat]
 ChunkCodecLibBlosc = "0.1"
-ChunkCodecCore = "0.2"
+ChunkCodecCore = "0.3"
 ChunkCodecLibBzip2 = "0.1"
 ChunkCodecLibLz4 = "0.1"
 ChunkCodecLibZlib = "0.1"
