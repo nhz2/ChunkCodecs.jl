@@ -153,6 +153,7 @@ function try_encode!(e::_AllEncodeOptions, dst::AbstractVector{UInt8}, src::Abst
                     (Ref{ZStream}, Cint),
                     stream, action,
                 )
+                @assert ret != Z_STREAM_ERROR # state not clobbered
                 @assert stream.avail_in ≤ start_avail_in
                 @assert stream.avail_out ≤ start_avail_out
                 # there must be progress
