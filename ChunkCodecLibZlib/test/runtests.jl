@@ -89,6 +89,15 @@ end
     @test_throws LibzDecodingError("unexpected $(length(c)) bytes after stream") decode(d, [encode(e, u); encode(e, u)])
     @test_throws LibzDecodingError("unexpected 1 bytes after stream") decode(d, [encode(e, u); 0x00])
 end
+@testset "Z_NEED_DICT error" begin
+    @test_throws(
+        LibzDecodingError("Z_NEED_DICT: a preset dictionary is needed at this point"),
+        decode(
+            ZlibDecodeOptions(),
+            UInt8[0x78, 0xbb, 0x00, 0x00, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00, 0x01],
+        )
+    )
+end
 @testset "errors" begin
     @test sprint(Base.showerror, LibzDecodingError("test error message")) ==
         "LibzDecodingError: test error message"

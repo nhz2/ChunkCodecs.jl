@@ -122,6 +122,9 @@ function deflateEnd(stream::ZStream)
 end
 
 function inflateInit2(stream::ZStream, windowBits::Cint)
+    # indicate that no input data is being provided for future zlib compat
+    stream.next_in = C_NULL
+    stream.avail_in = 0
     ret = ccall(
         (:inflateInit2_, libz),
         Cint,
