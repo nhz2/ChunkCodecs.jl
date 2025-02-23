@@ -10,7 +10,6 @@ using ChunkCodecCore:
     check_in_range,
     DecodingError
 import ChunkCodecCore:
-    codec,
     decode_options,
     can_concatenate,
     try_decode!,
@@ -33,8 +32,8 @@ export ZlibCodec,
     LibzDecodingError
 
 # reexport ChunkCodecCore
-using ChunkCodecCore: ChunkCodecCore, encode, decode, codec
-export ChunkCodecCore, encode, decode, codec
+using ChunkCodecCore: ChunkCodecCore, encode, decode
+export ChunkCodecCore, encode, decode
 
 
 include("libz.jl")

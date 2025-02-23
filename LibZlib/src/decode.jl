@@ -15,49 +15,70 @@ end
 
 """
     struct ZlibDecodeOptions <: DecodeOptions
-    ZlibDecodeOptions(::ZlibCodec=ZlibCodec(); kwargs...)
+    ZlibDecodeOptions(; kwargs...)
 
 zlib decompression using libzlib: https://www.zlib.net/
+
+This is the zlib format described in RFC 1950
+
+# Keyword Arguments
+
+- `codec::ZlibCodec=ZlibCodec()`
 """
 struct ZlibDecodeOptions <: DecodeOptions
-    function ZlibDecodeOptions(::ZlibCodec=ZlibCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::ZlibCodec
 end
-codec(::ZlibDecodeOptions) = ZlibCodec()
+function ZlibDecodeOptions(;
+        codec::ZlibCodec=ZlibCodec(),
+        kwargs...
+    )
+    ZlibDecodeOptions(codec)
+end
 
 """
     struct DeflateDecodeOptions <: DecodeOptions
-    DeflateDecodeOptions(::DeflateCodec=DeflateCodec(); kwargs...)
+    DeflateDecodeOptions(; kwargs...)
 
 deflate decompression using libzlib: https://www.zlib.net/
+
+This is the deflate format described in RFC 1951
+
+# Keyword Arguments
+
+- `codec::DeflateCodec=DeflateCodec()`
 """
 struct DeflateDecodeOptions <: DecodeOptions
-    function DeflateDecodeOptions(::DeflateCodec=DeflateCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::DeflateCodec
 end
-codec(::DeflateDecodeOptions) = DeflateCodec()
+function DeflateDecodeOptions(;
+        codec::DeflateCodec=DeflateCodec(),
+        kwargs...
+    )
+    DeflateDecodeOptions(codec)
+end
 
 
 """
     struct GzipDecodeOptions <: DecodeOptions
-    GzipDecodeOptions(::GzipCodec=GzipCodec(); kwargs...)
+    GzipDecodeOptions(; kwargs...)
 
 gzip decompression using libzlib: https://www.zlib.net/
+
+This is the gzip (.gz) format described in RFC 1952
+
+# Keyword Arguments
+
+- `codec::GzipCodec=GzipCodec()`
 """
 struct GzipDecodeOptions <: DecodeOptions
-    function GzipDecodeOptions(::GzipCodec=GzipCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::GzipCodec
 end
-codec(::GzipDecodeOptions) = GzipCodec()
+function GzipDecodeOptions(;
+        codec::GzipCodec=GzipCodec(),
+        kwargs...
+    )
+    GzipDecodeOptions(codec)
+end
 
 const _AllDecodeOptions = Union{ZlibDecodeOptions, DeflateDecodeOptions, GzipDecodeOptions}
 

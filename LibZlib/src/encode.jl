@@ -1,11 +1,14 @@
 """
     struct ZlibEncodeOptions <: EncodeOptions
-    ZlibEncodeOptions(::ZlibCodec=ZlibCodec(); kwargs...)
+    ZlibEncodeOptions(; kwargs...)
 
 zlib compression using libzlib: https://www.zlib.net/
 
+This is the zlib format described in RFC 1950
+
 # Keyword Arguments
 
+- `codec::ZlibCodec=ZlibCodec()`
 - `level::Integer=-1`: The compression level must be -1, or between 0 and 9.
 1 gives best speed, 9 gives best compression, 0 gives no compression at all
 (the input data is simply copied a block at a time). -1
@@ -13,27 +16,31 @@ requests a default compromise between speed and compression (currently
 equivalent to level 6).
 """
 struct ZlibEncodeOptions <: EncodeOptions
-    level::Cint
+    codec::ZlibCodec
+    level::Int32
 end
-codec(::ZlibEncodeOptions) = ZlibCodec()
-function ZlibEncodeOptions(::ZlibCodec=ZlibCodec();
+function ZlibEncodeOptions(;
+        codec::ZlibCodec=ZlibCodec(),
         level::Integer=-1,
         kwargs...
     )
-    check_in_range(-1:9; level)
     ZlibEncodeOptions(
-        level,
+        codec,
+        Int32(clamp(level, -1, 9)),
     )
 end
 
 """
     struct DeflateEncodeOptions <: EncodeOptions
-    DeflateEncodeOptions(::DeflateCodec=DeflateCodec(); kwargs...)
+    DeflateEncodeOptions(; kwargs...)
 
 deflate compression using libzlib: https://www.zlib.net/
 
+This is the deflate format described in RFC 1951
+
 # Keyword Arguments
 
+- `codec::DeflateCodec=DeflateCodec()`
 - `level::Integer=-1`: The compression level must be -1, or between 0 and 9.
 1 gives best speed, 9 gives best compression, 0 gives no compression at all
 (the input data is simply copied a block at a time). -1
@@ -41,27 +48,31 @@ requests a default compromise between speed and compression (currently
 equivalent to level 6).
 """
 struct DeflateEncodeOptions <: EncodeOptions
-    level::Cint
+    codec::DeflateCodec
+    level::Int32
 end
-codec(::DeflateEncodeOptions) = DeflateCodec()
-function DeflateEncodeOptions(::DeflateCodec=DeflateCodec();
+function DeflateEncodeOptions(;
+        codec::DeflateCodec=DeflateCodec(),
         level::Integer=-1,
         kwargs...
     )
-    check_in_range(-1:9; level)
     DeflateEncodeOptions(
-        level,
+        codec,
+        Int32(clamp(level, -1, 9)),
     )
 end
 
 """
     struct GzipEncodeOptions <: EncodeOptions
-    GzipEncodeOptions(::GzipCodec=GzipCodec(); kwargs...)
+    GzipEncodeOptions(; kwargs...)
 
 gzip compression using libzlib: https://www.zlib.net/
 
+This is the gzip (.gz) format described in RFC 1952
+
 # Keyword Arguments
 
+- `codec::GzipCodec=GzipCodec()`
 - `level::Integer=-1`: The compression level must be -1, or between 0 and 9.
 1 gives best speed, 9 gives best compression, 0 gives no compression at all
 (the input data is simply copied a block at a time). -1
@@ -69,16 +80,17 @@ requests a default compromise between speed and compression (currently
 equivalent to level 6).
 """
 struct GzipEncodeOptions <: EncodeOptions
-    level::Cint
+    codec::GzipCodec
+    level::Int32
 end
-codec(::GzipEncodeOptions) = GzipCodec()
-function GzipEncodeOptions(::GzipCodec=GzipCodec();
+function GzipEncodeOptions(;
+        codec::GzipCodec=GzipCodec(),
         level::Integer=-1,
         kwargs...
     )
-    check_in_range(-1:9; level)
     GzipEncodeOptions(
-        level,
+        codec,
+        Int32(clamp(level, -1, 9)),
     )
 end
 
@@ -104,16 +116,16 @@ _wraplen(::GzipEncodeOptions)    = Int64(18)
 
 # max to prevent overflows in encode_bound
 # From ChunkCodecTests.find_max_decoded_size(::EncodeOptions)
-max_decoded_size(::ZlibEncodeOptions)::Int64 = 0x7ff60087fa602c72
-max_decoded_size(::DeflateEncodeOptions)::Int64 = 0x7ff60087fa602c78
-max_decoded_size(::GzipEncodeOptions)::Int64 = 0x7ff60087fa602c66
+_max_decoded_size(::ZlibEncodeOptions)::Int64 = 0x7ff60087fa602c72
+_max_decoded_size(::DeflateEncodeOptions)::Int64 = 0x7ff60087fa602c78
+_max_decoded_size(::GzipEncodeOptions)::Int64 = 0x7ff60087fa602c66
 
-decoded_size_range(e::_AllEncodeOptions) = Int64(0):Int64(1):max_decoded_size(e)
+decoded_size_range(e::_AllEncodeOptions) = Int64(0):Int64(1):_max_decoded_size(e)
 
-function try_encode!(e::_AllEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8})::Union{Nothing, Int64}
+function try_encode!(e::_AllEncodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
     # -15: deflate, 15: zlib, 15+16: gzip
     # smaller windowBits might break encode bound
-    windowBits = _windowBits(codec(e))
+    windowBits = _windowBits(e.codec)
     @assert windowBits ∈ (-15, 15, 15+16)
     check_contiguous(dst)
     check_contiguous(src)
@@ -137,7 +149,7 @@ function try_encode!(e::_AllEncodeOptions, dst::AbstractVector{UInt8}, src::Abst
             src_left::Int64 = src_size
             dst_left::Int64 = dst_size
             while true
-                start_avail_in = min(clamp(src_left, Cuint), Cuint(2^26))
+                start_avail_in = clamp(src_left, Cuint)
                 start_avail_out = clamp(dst_left, Cuint)
                 stream.avail_in = start_avail_in
                 stream.avail_out = start_avail_out
