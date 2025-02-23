@@ -23,7 +23,6 @@ jobs:
           - 'LibZlib'
           - 'LibZstd'
           - 'main'
-          - 'Tests'
         version:
           - '1'
         os:
