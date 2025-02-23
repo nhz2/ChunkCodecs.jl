@@ -17,12 +17,12 @@ jobs:
       matrix:
         package:
           - 'LibBlosc'
-          - 'Core'
+          - 'ChunkCodecCore'
           - 'LibBzip2'
           - 'LibLz4'
           - 'LibZlib'
           - 'LibZstd'
-          - 'main'
+          - 'ChunkCodecs'
         version:
           - '1'
         os:
