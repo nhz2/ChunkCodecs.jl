@@ -20,10 +20,10 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [sources]
 ChunkCodecCore = {path = "../ChunkCodecCore"}
-ChunkCodecLibBlosc = {path = "../ChunkCodecLibBlosc"}
-ChunkCodecLibBzip2 = {path = "../ChunkCodecLibBzip2"}
-ChunkCodecLibLz4 = {path = "../ChunkCodecLibLz4"}
-ChunkCodecLibZlib = {path = "../ChunkCodecLibZlib"}
-ChunkCodecLibZstd = {path = "../ChunkCodecLibZstd"}
+ChunkCodecLibBlosc = {path = "../LibBlosc"}
+ChunkCodecLibBzip2 = {path = "../LibBzip2"}
+ChunkCodecLibLz4 = {path = "../LibLz4"}
+ChunkCodecLibZlib = {path = "../LibZlib"}
+ChunkCodecLibZstd = {path = "../LibZstd"}
 ChunkCodecTests = {path = "../ChunkCodecTests"}
 ChunkCodecs = {path = "../ChunkCodecs"}

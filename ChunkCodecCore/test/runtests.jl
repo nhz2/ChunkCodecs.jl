@@ -4,11 +4,12 @@ using ChunkCodecCore:
     NoopCodec, NoopEncodeOptions, NoopDecodeOptions,
     ShuffleCodec, ShuffleEncodeOptions, ShuffleDecodeOptions,
     DecodedSizeError, decode
-using ChunkCodecTests: test_codec, test_encoder_decoder
+using ChunkCodecTests:ChunkCodecTests, test_codec, test_encoder_decoder
 using Aqua: Aqua
 using Test: @test, @testset, @test_throws
 
 Aqua.test_all(ChunkCodecCore)
+Aqua.test_all(ChunkCodecTests)
 
 Random.seed!(1234)
 

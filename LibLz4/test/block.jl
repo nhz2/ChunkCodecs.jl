@@ -8,7 +8,13 @@ using Test: @testset, @test_throws, @test
     @test encode_bound(LZ4BlockEncodeOptions(), a) > a
 end
 @testset "default" begin
-    test_codec(LZ4BlockCodec(), LZ4BlockEncodeOptions(), LZ4BlockDecodeOptions(); trials=100)
+    # LZ4 on win32 is very slow
+    trials = if Sys.iswindows() && Sys.WORD_SIZE == 32
+        10
+    else
+        100
+    end
+    test_codec(LZ4BlockCodec(), LZ4BlockEncodeOptions(), LZ4BlockDecodeOptions(); trials)
 end
 @testset "compressionLevel options" begin
     # Compression level is clamped
