@@ -12,7 +12,7 @@ ExplicitImports = "7d51a73a-1435-4ff3-83d9-f097790105c7"
 
 [sources]
 ChunkCodecLibBlosc = {path = "../../LibBlosc"}
-ChunkCodecCore = {path = "../../Core"}
+ChunkCodecCore = {path = "../ChunkCodecCore"}
 ChunkCodecLibBzip2 = {path = "../../LibBzip2"}
 ChunkCodecLibLz4 = {path = "../../LibLz4"}
 ChunkCodecLibZlib = {path = "../../LibZlib"}

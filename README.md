@@ -19,11 +19,11 @@ This monorepo holds a number of different Julia packages:
 
 There are also a number of packages with glue code to implement the interface for various C libraries.
 
-- `ChunkCodecLibBlosc`
-- `ChunkCodecLibBzip2`
-- `ChunkCodecLibLz4`
-- `ChunkCodecLibZlib`
-- `ChunkCodecLibZstd`
+- `LibBlosc`
+- `LibBzip2`
+- `LibLz4`
+- `LibZlib`
+- `LibZstd`
 
 Each package contains basic tests.
 
