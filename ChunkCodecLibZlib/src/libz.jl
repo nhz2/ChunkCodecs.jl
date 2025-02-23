@@ -119,6 +119,7 @@ function deflateEnd(stream::ZStream)
             stream,
         )
     end
+    nothing
 end
 
 function inflateInit2(stream::ZStream, windowBits::Cint)
