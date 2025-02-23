@@ -13,7 +13,6 @@ ChunkCodecLibZstd = "55437552-ac27-4d47-9aa3-63184e8fd398"
 
 [sources]
 ChunkCodecLibBlosc = {path = "../LibBlosc"}
-ChunkCodecCore = {path = "ChunkCodecCore"}
 ChunkCodecLibBzip2 = {path = "../LibBzip2"}
 ChunkCodecLibLz4 = {path = "../LibLz4"}
 ChunkCodecLibZlib = {path = "../LibZlib"}
