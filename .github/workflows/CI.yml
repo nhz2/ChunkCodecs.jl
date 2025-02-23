@@ -22,7 +22,7 @@ jobs:
           - 'LibLz4'
           - 'LibZlib'
           - 'LibZstd'
-          - 's'
+          - 'main'
           - 'Tests'
         version:
           - '1'
