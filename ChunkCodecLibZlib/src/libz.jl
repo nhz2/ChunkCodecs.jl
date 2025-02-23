@@ -101,7 +101,7 @@ function deflateInit2(stream::ZStream, level::Cint, windowBits::Cint)
         elseif ret == Z_STREAM_ERROR
             error("Z_STREAM_ERROR: invalid parameter") # this should be validated before this
         elseif ret == Z_VERSION_ERROR
-            error("Z_VERSION_ERROR: zlib version is incompatible, this should never happen")
+            error("Z_VERSION_ERROR: zlib version is incompatible")
         else
             error("Unknown zlib error code: $(ret)")
         end
@@ -119,9 +119,13 @@ function deflateEnd(stream::ZStream)
             stream,
         )
     end
+    nothing
 end
 
 function inflateInit2(stream::ZStream, windowBits::Cint)
+    # indicate that no input data is being provided for future zlib compat
+    stream.next_in = C_NULL
+    stream.avail_in = 0
     ret = ccall(
         (:inflateInit2_, libz),
         Cint,
@@ -134,7 +138,7 @@ function inflateInit2(stream::ZStream, windowBits::Cint)
         elseif ret == Z_STREAM_ERROR
             error("Z_STREAM_ERROR: invalid parameter")
         elseif ret == Z_VERSION_ERROR
-            error("Z_VERSION_ERROR: zlib version is incompatible, this should never happen")
+            error("Z_VERSION_ERROR: zlib version is incompatible")
         else
             error("Unknown zlib error code: $(ret)")
         end
