@@ -11,11 +11,11 @@ ChunkCodecs = "cea5061e-088a-433e-a623-54fa23d14d8f"
 ExplicitImports = "7d51a73a-1435-4ff3-83d9-f097790105c7"
 
 [sources]
-ChunkCodecLibBlosc = {path = "../../ChunkCodecLibBlosc"}
-ChunkCodecCore = {path = "../../ChunkCodecCore"}
-ChunkCodecLibBzip2 = {path = "../../ChunkCodecLibBzip2"}
-ChunkCodecLibLz4 = {path = "../../ChunkCodecLibLz4"}
-ChunkCodecLibZlib = {path = "../../ChunkCodecLibZlib"}
-ChunkCodecLibZstd = {path = "../../ChunkCodecLibZstd"}
-ChunkCodecTests = {path = "../../ChunkCodecTests"}
+ChunkCodecLibBlosc = {path = "../../LibBlosc"}
+ChunkCodecCore = {path = "../../Core"}
+ChunkCodecLibBzip2 = {path = "../../LibBzip2"}
+ChunkCodecLibLz4 = {path = "../../LibLz4"}
+ChunkCodecLibZlib = {path = "../../LibZlib"}
+ChunkCodecLibZstd = {path = "../../LibZstd"}
+ChunkCodecTests = {path = "../../Tests"}
 ChunkCodecs = {path = ".."}
