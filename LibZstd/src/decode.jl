@@ -19,25 +19,28 @@ end
 
 """
     struct ZstdDecodeOptions <: DecodeOptions
-    ZstdDecodeOptions(::ZstdCodec=ZstdCodec(); kwargs...)
+    ZstdDecodeOptions(; kwargs...)
 
 # Keyword Arguments
 
+- `codec::ZstdCodec=ZstdCodec()`
 - `advanced_parameters::Vector{Pair{Cint, Cint}}=[]`:
 Warning, some parameters are experimental and may change in new versions of libzstd,
 so you may need to check `ZSTD_VERSION`. See comments in zstd.h.
 Additional parameters are set with `ZSTD_DCtx_setParameter`.
 """
 struct ZstdDecodeOptions <: DecodeOptions
+    codec::ZstdCodec
     advanced_parameters::Vector{Pair{Cint, Cint}}
 end
-function ZstdDecodeOptions(::ZstdCodec=ZstdCodec(); 
+function ZstdDecodeOptions(;
+        codec::ZstdCodec=ZstdCodec(),
         advanced_parameters::Vector{Pair{Cint, Cint}}=Pair{Cint, Cint}[],
         kwargs...
     )
-    ZstdDecodeOptions(advanced_parameters)
+    ZstdDecodeOptions(codec, advanced_parameters)
 end
-codec(::ZstdDecodeOptions) = ZstdCodec()
+
 is_thread_safe(::ZstdDecodeOptions) = true
 
 # find_decompressed_size is modified from CodecZstd.jl

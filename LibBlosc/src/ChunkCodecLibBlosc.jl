@@ -10,7 +10,6 @@ using ChunkCodecCore:
     check_contiguous,
     DecodingError
 import ChunkCodecCore:
-    codec,
     decode_options,
     try_decode!,
     try_encode!,
@@ -26,8 +25,8 @@ export BloscCodec,
 public is_compressor_valid
 
 # reexport ChunkCodecCore
-using ChunkCodecCore: ChunkCodecCore, encode, decode, codec
-export ChunkCodecCore, encode, decode, codec
+using ChunkCodecCore: ChunkCodecCore, encode, decode
+export ChunkCodecCore, encode, decode
 
 include("libblosc.jl")
 

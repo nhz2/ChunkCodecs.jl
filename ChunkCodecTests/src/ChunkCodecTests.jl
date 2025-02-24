@@ -4,7 +4,6 @@ using ChunkCodecCore:
     Codec,
     EncodeOptions,
     DecodeOptions,
-    codec,
     is_thread_safe,
     can_concatenate,
     decode_options,
@@ -25,10 +24,16 @@ export test_codec, test_encoder_decoder, rand_test_data
 function test_codec(c::Codec, e::EncodeOptions, d::DecodeOptions; trials=100)
     @test decode_options(c) isa DecodeOptions
     @test can_concatenate(c) isa Bool
-    @test codec(e) == c
-    @test codec(d) == c
+    @test e.codec == c
+    @test d.codec == c
     @test is_thread_safe(e) isa Bool
     @test is_thread_safe(d) isa Bool
+
+    e_props = Tuple(propertynames(e))
+    @test typeof(e)(;NamedTuple{e_props}(getproperty.((e,), e_props))...) == e
+
+    d_props = Tuple(propertynames(d))
+    @test typeof(d)(;NamedTuple{d_props}(getproperty.((d,), d_props))...) == d
 
     test_encoder_decoder(e, d; trials)
 
@@ -154,7 +159,7 @@ end
 """
     last_good_input(f)
 
-Return the max value of `x` where `f(x::Int64)` doesn't error
+Return the max value of `x` where `f(x::Int64)` doesn't equal typemax(Int64)
 `f` must be monotonically increasing
 """
 function last_good_input(f)
@@ -162,10 +167,9 @@ function last_good_input(f)
     high::Int64 = typemax(Int64)
     while low != high - 1
         x = (low+high)>>>1
-        try
-            f(x)
+        if f(x) != typemax(Int64)
             low = x
-        catch
+        else
             high = x
         end
     end

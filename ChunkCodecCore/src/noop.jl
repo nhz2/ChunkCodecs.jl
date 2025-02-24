@@ -4,7 +4,7 @@
     struct NoopCodec <: Codec
     NoopCodec()
 
-This codec copies the input.
+Copies the input.
 
 See also [`NoopEncodeOptions`](@ref) and [`NoopDecodeOptions`](@ref)
 """
@@ -14,18 +14,23 @@ decode_options(::NoopCodec) = NoopDecodeOptions() # default decode options
 
 """
     struct NoopEncodeOptions <: EncodeOptions
-    NoopEncodeOptions(::NoopCodec=NoopCodec(); kwargs...)
+    NoopEncodeOptions(; kwargs...)
 
 Copies the input.
+
+# Keyword Arguments
+
+- `codec::NoopCodec=NoopCodec()`
 """
 struct NoopEncodeOptions <: EncodeOptions
-    function NoopEncodeOptions(::NoopCodec=NoopCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::NoopCodec
 end
-codec(::NoopEncodeOptions) = NoopCodec()
+function NoopEncodeOptions(;
+        codec::NoopCodec=NoopCodec(),
+        kwargs...
+    )
+    NoopEncodeOptions(codec)
+end
 
 is_thread_safe(::NoopEncodeOptions) = true
 
@@ -47,18 +52,23 @@ end
 
 """
     struct NoopDecodeOptions <: DecodeOptions
-    NoopDecodeOptions(::NoopCodec=NoopCodec(); kwargs...)
+    NoopDecodeOptions(; kwargs...)
 
 Copies the input.
+
+# Keyword Arguments
+
+- `codec::NoopCodec=NoopCodec()`
 """
 struct NoopDecodeOptions <: DecodeOptions
-    function NoopDecodeOptions(::NoopCodec=NoopCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::NoopCodec
 end
-codec(::NoopDecodeOptions) = NoopCodec()
+function NoopDecodeOptions(;
+        codec::NoopCodec=NoopCodec(),
+        kwargs...
+    )
+    NoopDecodeOptions(codec)
+end
 
 is_thread_safe(::NoopDecodeOptions) = true
 

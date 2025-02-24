@@ -54,13 +54,14 @@ end
 
 # version of NoopDecodeOptions that returns unknown try_find_decoded_size
 struct TestDecodeOptions <: ChunkCodecCore.DecodeOptions
-    function TestDecodeOptions(::NoopCodec=NoopCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::NoopCodec
 end
-ChunkCodecCore.codec(::TestDecodeOptions) = NoopCodec()
+function TestDecodeOptions(;
+        codec::NoopCodec=NoopCodec(),
+        kwargs...
+    )
+    TestDecodeOptions(codec)
+end
 ChunkCodecCore.try_find_decoded_size(::TestDecodeOptions, src::AbstractVector{UInt8}) = nothing
 function ChunkCodecCore.try_decode!(::TestDecodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
     dst_size::Int64 = length(dst)

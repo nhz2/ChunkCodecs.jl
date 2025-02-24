@@ -1,11 +1,12 @@
 """
     struct BloscEncodeOptions <: EncodeOptions
-    BloscEncodeOptions(::BloscCodec=BloscCodec(); kwargs...)
+    BloscEncodeOptions(; kwargs...)
 
 Blosc compression using c-blosc library: https://github.com/Blosc/c-blosc
 
 # Keyword Arguments
 
+- `codec::BloscCodec=BloscCodec()`
 - `clevel::Integer=5`: The compression level, between 0 (no compression) and 9 (maximum compression)
 - `doshuffle::Integer=1`: Whether to use the shuffle filter.
 0 means not applying it, 1 means applying it at a byte level,
@@ -23,6 +24,7 @@ automatic blocksize will be used.
 Must be in `1:$(BLOSC_MAX_THREADS)`.
 """
 struct BloscEncodeOptions <: EncodeOptions
+    codec::BloscCodec
     clevel::Cint
     doshuffle::Cint
     typesize::Csize_t
@@ -30,9 +32,8 @@ struct BloscEncodeOptions <: EncodeOptions
     blocksize::Csize_t
     numinternalthreads::Cint
 end
-codec(::BloscEncodeOptions) = BloscCodec()
-
-function BloscEncodeOptions(::BloscCodec=BloscCodec();
+function BloscEncodeOptions(;
+        codec::BloscCodec=BloscCodec(),
         clevel::Integer=5,
         doshuffle::Integer=1,
         typesize::Integer=1,
@@ -52,6 +53,7 @@ function BloscEncodeOptions(::BloscCodec=BloscCodec();
     check_in_range(typemin(Csize_t):typemax(Csize_t); blocksize)
     check_in_range(1:BLOSC_MAX_THREADS; numinternalthreads)
     BloscEncodeOptions(
+        codec,
         clevel,
         doshuffle,
         _typesize,

@@ -105,10 +105,10 @@ function try_resize_decode!(d::_AllDecodeOptions, dst::AbstractVector{UInt8}, sr
     end
     cconv_src = Base.cconvert(Ptr{UInt8}, src)
     # This outer loop is to decode a concatenation of multiple compressed streams.
-    # If `can_concatenate(codec(d))` is false, this outer loop doesn't rerun.
+    # If `can_concatenate(d.codec)` is false, this outer loop doesn't rerun.
     while true
         stream = ZStream()
-        inflateInit2(stream, _windowBits(codec(d)))
+        inflateInit2(stream, _windowBits(d.codec))
         try
             # This inner loop is needed because libz can work on at most 
             # 2^32 - 1 bytes at a time.
@@ -178,7 +178,7 @@ function try_resize_decode!(d::_AllDecodeOptions, dst::AbstractVector{UInt8}, sr
                             end
                             return real_dst_size
                         else
-                            if can_concatenate(codec(d))
+                            if can_concatenate(d.codec)
                                 # try and decompress next stream if the codec can_concatenate
                                 # there must be progress
                                 @assert stream.avail_in < start_avail_in || stream.avail_out < start_avail_out

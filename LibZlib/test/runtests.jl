@@ -47,9 +47,10 @@ tests = [
         test_codec(codec(), encode_opt(), decode_opt(); trials=50)
     end
     @testset "level options" begin
-        @test_throws ArgumentError encode_opt(; level=-10)
-        @test_throws ArgumentError encode_opt(; level=10)
-        @test_throws ArgumentError encode_opt(; level=-2)
+        # level should get clamped to -1 to 9
+        @test encode_opt(; level=-10).level == -1
+        @test encode_opt(; level=10).level == 9
+        @test encode_opt(; level=-2).level == -1
         for i in -1:9
             test_codec(codec(), encode_opt(; level=i), decode_opt(); trials=5)
         end

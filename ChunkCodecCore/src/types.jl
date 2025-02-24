@@ -3,7 +3,7 @@
 
 Required information to decode encoded data.
 
-Fields are public.
+Properties are public for reading.
 
 Required methods for a type `T <: Codec` to implement:
 - `decode_options(::T)::DecodeOptions`
@@ -18,8 +18,10 @@ abstract type Codec end
 
 Options for encoding data.
 
-Fields are public.
-A `.codec` field that is a `Codec` is required.
+Properties are public for reading.
+All `EncodeOptions` have a keyword argument constructor
+that accept all properties as arguments.
+All `EncodeOptions` have a `codec::Codec` property.
 
 Required methods for a type `T <: EncodeOptions` to implement:
 - `decoded_size_range(::T)::StepRange{Int64, Int64}`
@@ -37,8 +39,10 @@ abstract type EncodeOptions end
 
 Options for decoding data.
 
-Fields are public.
-A `.codec` field that is a `Codec` is required.
+Properties are public for reading.
+All `DecodeOptions` have a keyword argument constructor
+that accept all properties as arguments.
+All `DecodeOptions` have a `codec::Codec` property.
 
 Required methods for a type `T <: DecodeOptions` to implement:
 - `try_find_decoded_size(::T, src::AbstractVector{UInt8})::Union{Nothing, Int64}`

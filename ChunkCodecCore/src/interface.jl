@@ -9,7 +9,7 @@ Throw an error if `length(src)` is not in `decoded_size_range(e)`
 
 Otherwise throw an error.
 
-See also [`EncodeOptions`](@ref).
+See also [`EncodeOptions`](@ref) and [`decode`](@ref).
 """
 function encode(e, src::AbstractVector{UInt8})::Vector{UInt8}
     src_size::Int64 = length(src)
@@ -19,7 +19,10 @@ function encode(e, src::AbstractVector{UInt8})::Vector{UInt8}
     dst = Vector{UInt8}(undef, dst_size)
     real_dst_size = something(try_encode!(e, dst, src))
     @assert real_dst_size ∈ 0:dst_size
-    resize!(dst, real_dst_size)
+    if real_dst_size < dst_size
+        resize!(dst, real_dst_size)
+    end
+    @assert real_dst_size == length(dst)
     dst
 end
 
@@ -38,7 +41,7 @@ Otherwise throw an error.
 If you have a good idea of what the decoded size is, using the `size_hint` keyword argument
 can greatly improve performance.
 
-See also [`DecodeOptions`](@ref).
+See also [`DecodeOptions`](@ref) and [`encode`](@ref)
 """
 function decode(
         d,
@@ -51,12 +54,12 @@ function decode(
         throw(DecodedSizeError(_clamp_max_size, nothing))
     end
     _clamp_size_hint::Int64 = clamp(size_hint, Int64(0), _clamp_max_size)
-    dst = zeros(UInt8, _clamp_size_hint)
+    dst = Vector{UInt8}(undef, _clamp_size_hint)
     real_dst_size = try_resize_decode!(d, dst, src, _clamp_max_size)::Union{Nothing, Int64}
     if isnothing(real_dst_size)
         throw(DecodedSizeError(_clamp_max_size, try_find_decoded_size(d, src)))
     end
-    @assert !signbit(real_dst_size)
+    @assert real_dst_size ∈ 0:_clamp_max_size
     if real_dst_size < _clamp_size_hint
         resize!(dst, real_dst_size)
     end
@@ -81,14 +84,6 @@ the concatenation of `a` and `b` will
 decode to the concatenation of `x` and `y`
 """
 can_concatenate(::Codec) = false
-
-"""
-    codec(e)::Codec
-
-Return the codec associated with the encoding or decoding options.
-The codec contains the information required for decoding.
-"""
-function codec end
 
 """
     decoded_size_range(e)::StepRange{Int64, Int64}
@@ -138,7 +133,7 @@ function try_encode! end
 """
     is_thread_safe(::Union{Codec, DecodeOptions, EncodeOptions})::Bool
 
-Return `true` if it is safe to use the the options to encode or decode concurrently in multiple threads.
+Return `true` if it is safe to use the options to encode or decode concurrently in multiple threads.
 """
 is_thread_safe(::EncodeOptions) = false
 is_thread_safe(::DecodeOptions) = false
@@ -196,11 +191,12 @@ Precondition: `dst` and `src` do not overlap in memory.
 
 All of `dst` can be written to or used as scratch space by the decoder.
 Only the initial returned number of bytes are valid output.
+
+If the size of `dst` is increased, its length will be equal to the returned number of bytes.
 """
 function try_resize_decode!(d, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}, max_size::Int64; kwargs...)::Union{Nothing, Int64}
     check_in_range(Int64(0):max_size; dst_size=length(dst))
     olb::Int64 = length(dst)
-    real_dst_size::Int64 = -1
     decoded_size = try_find_decoded_size(d, src)::Union{Nothing, Int64}
     if isnothing(decoded_size)
         while true
@@ -220,8 +216,12 @@ function try_resize_decode!(d, dst::AbstractVector{UInt8}, src::AbstractVector{U
                 end
                 resize!(dst, next_size)
             else
-                real_dst_size = ds
-                break
+                @assert ds ∈ 0:length(dst)
+                if length(dst) > olb && length(dst) != ds
+                    @assert ds > olb
+                    resize!(dst, ds) # shrink to just contain output if it was resized.
+                end
+                return ds
             end
         end
     else
@@ -233,13 +233,8 @@ function try_resize_decode!(d, dst::AbstractVector{UInt8}, src::AbstractVector{U
         end
         real_dst_size = something(try_decode!(d, dst, src))
         @assert real_dst_size == decoded_size
+        return real_dst_size
     end
-    @assert real_dst_size ∈ 0:length(dst)
-    if length(dst) > olb && length(dst) != real_dst_size
-        @assert real_dst_size > olb
-        resize!(dst, real_dst_size) # shrink to just contain output if it was resized.
-    end
-    return real_dst_size
 end
 
 # allow passing codec to decode
