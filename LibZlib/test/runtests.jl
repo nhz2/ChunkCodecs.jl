@@ -16,7 +16,7 @@ using ChunkCodecTests: test_codec
 using Test: @testset, @test_throws, @test
 using Aqua: Aqua
 
-Aqua.test_all(ChunkCodecLibZlib)
+Aqua.test_all(ChunkCodecLibZlib; persistent_tasks = false)
 
 Random.seed!(1234)
 

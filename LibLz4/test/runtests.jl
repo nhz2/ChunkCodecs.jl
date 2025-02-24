@@ -3,7 +3,7 @@ using ChunkCodecLibLz4
 using Test: @testset, @test_throws, @test
 using Aqua: Aqua
 
-Aqua.test_all(ChunkCodecLibLz4)
+Aqua.test_all(ChunkCodecLibLz4; persistent_tasks = false)
 
 Random.seed!(1234)
 @testset "frame" begin

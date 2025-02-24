@@ -8,8 +8,8 @@ using ChunkCodecTests:ChunkCodecTests, test_codec, test_encoder_decoder
 using Aqua: Aqua
 using Test: @test, @testset, @test_throws
 
-Aqua.test_all(ChunkCodecCore)
-Aqua.test_all(ChunkCodecTests)
+Aqua.test_all(ChunkCodecCore; persistent_tasks = false)
+Aqua.test_all(ChunkCodecTests; persistent_tasks = false)
 
 Random.seed!(1234)
 
