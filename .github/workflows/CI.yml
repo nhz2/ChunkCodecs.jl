@@ -7,7 +7,11 @@ on:
   pull_request:
     branches:
       - main
-
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{matrix.package}} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}

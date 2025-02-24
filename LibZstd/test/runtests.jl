@@ -10,7 +10,7 @@ using ChunkCodecTests: test_codec
 using Test: @testset, @test_throws, @test
 using Aqua: Aqua
 
-Aqua.test_all(ChunkCodecLibZstd)
+Aqua.test_all(ChunkCodecLibZstd; persistent_tasks = false)
 
 Random.seed!(1234)
 @testset "encode_bound" begin

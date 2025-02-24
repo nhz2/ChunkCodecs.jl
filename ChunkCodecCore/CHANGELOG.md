@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [v0.4.0](https://github.com/nhz2/ChunkCodecs.jl/tree/ChunkCodecCore-v0.4.0) - 2025-02-24
+
 ### BREAKING the `codec` function is replaced with a `.codec` property [#11](https://github.com/nhz2/ChunkCodecs.jl/pull/11)
 
 ## [v0.3.0](https://github.com/nhz2/ChunkCodecs.jl/tree/ChunkCodecCore-v0.3.0) - 2025-01-03
