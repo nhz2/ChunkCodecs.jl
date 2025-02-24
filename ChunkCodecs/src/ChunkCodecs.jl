@@ -1,8 +1,8 @@
 module ChunkCodecs
 
 # reexport ChunkCodecCore
-using ChunkCodecCore: ChunkCodecCore, encode, decode, codec
-export ChunkCodecCore, encode, decode, codec
+using ChunkCodecCore: ChunkCodecCore, encode, decode
+export ChunkCodecCore, encode, decode
 
 codec_packages = [
     :ChunkCodecLibBlosc,
