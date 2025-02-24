@@ -1,6 +1,6 @@
 module ChunkCodecCore
 
-export decode, encode, codec
+export decode, encode
 
 public Codec
 public EncodeOptions

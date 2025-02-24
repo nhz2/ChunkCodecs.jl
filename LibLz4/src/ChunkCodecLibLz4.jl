@@ -10,7 +10,6 @@ using ChunkCodecCore:
     check_in_range,
     DecodingError
 import ChunkCodecCore:
-    codec,
     decode_options,
     can_concatenate,
     try_decode!,
@@ -39,8 +38,8 @@ export LZ4FrameCodec,
 public LZ4F_MAX_CLEVEL
 
 # reexport ChunkCodecCore
-using ChunkCodecCore: ChunkCodecCore, encode, decode, codec
-export ChunkCodecCore, encode, decode, codec
+using ChunkCodecCore: ChunkCodecCore, encode, decode
+export ChunkCodecCore, encode, decode
 
 
 include("liblz4.jl")

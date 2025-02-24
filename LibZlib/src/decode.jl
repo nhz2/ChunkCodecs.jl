@@ -15,49 +15,70 @@ end
 
 """
     struct ZlibDecodeOptions <: DecodeOptions
-    ZlibDecodeOptions(::ZlibCodec=ZlibCodec(); kwargs...)
+    ZlibDecodeOptions(; kwargs...)
 
 zlib decompression using libzlib: https://www.zlib.net/
+
+This is the zlib format described in RFC 1950
+
+# Keyword Arguments
+
+- `codec::ZlibCodec=ZlibCodec()`
 """
 struct ZlibDecodeOptions <: DecodeOptions
-    function ZlibDecodeOptions(::ZlibCodec=ZlibCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::ZlibCodec
 end
-codec(::ZlibDecodeOptions) = ZlibCodec()
+function ZlibDecodeOptions(;
+        codec::ZlibCodec=ZlibCodec(),
+        kwargs...
+    )
+    ZlibDecodeOptions(codec)
+end
 
 """
     struct DeflateDecodeOptions <: DecodeOptions
-    DeflateDecodeOptions(::DeflateCodec=DeflateCodec(); kwargs...)
+    DeflateDecodeOptions(; kwargs...)
 
 deflate decompression using libzlib: https://www.zlib.net/
+
+This is the deflate format described in RFC 1951
+
+# Keyword Arguments
+
+- `codec::DeflateCodec=DeflateCodec()`
 """
 struct DeflateDecodeOptions <: DecodeOptions
-    function DeflateDecodeOptions(::DeflateCodec=DeflateCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::DeflateCodec
 end
-codec(::DeflateDecodeOptions) = DeflateCodec()
+function DeflateDecodeOptions(;
+        codec::DeflateCodec=DeflateCodec(),
+        kwargs...
+    )
+    DeflateDecodeOptions(codec)
+end
 
 
 """
     struct GzipDecodeOptions <: DecodeOptions
-    GzipDecodeOptions(::GzipCodec=GzipCodec(); kwargs...)
+    GzipDecodeOptions(; kwargs...)
 
 gzip decompression using libzlib: https://www.zlib.net/
+
+This is the gzip (.gz) format described in RFC 1952
+
+# Keyword Arguments
+
+- `codec::GzipCodec=GzipCodec()`
 """
 struct GzipDecodeOptions <: DecodeOptions
-    function GzipDecodeOptions(::GzipCodec=GzipCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::GzipCodec
 end
-codec(::GzipDecodeOptions) = GzipCodec()
+function GzipDecodeOptions(;
+        codec::GzipCodec=GzipCodec(),
+        kwargs...
+    )
+    GzipDecodeOptions(codec)
+end
 
 const _AllDecodeOptions = Union{ZlibDecodeOptions, DeflateDecodeOptions, GzipDecodeOptions}
 
@@ -84,10 +105,10 @@ function try_resize_decode!(d::_AllDecodeOptions, dst::AbstractVector{UInt8}, sr
     end
     cconv_src = Base.cconvert(Ptr{UInt8}, src)
     # This outer loop is to decode a concatenation of multiple compressed streams.
-    # If `can_concatenate(codec(d))` is false, this outer loop doesn't rerun.
+    # If `can_concatenate(d.codec)` is false, this outer loop doesn't rerun.
     while true
         stream = ZStream()
-        inflateInit2(stream, _windowBits(codec(d)))
+        inflateInit2(stream, _windowBits(d.codec))
         try
             # This inner loop is needed because libz can work on at most 
             # 2^32 - 1 bytes at a time.
@@ -157,7 +178,7 @@ function try_resize_decode!(d::_AllDecodeOptions, dst::AbstractVector{UInt8}, sr
                             end
                             return real_dst_size
                         else
-                            if can_concatenate(codec(d))
+                            if can_concatenate(d.codec)
                                 # try and decompress next stream if the codec can_concatenate
                                 # there must be progress
                                 @assert stream.avail_in < start_avail_in || stream.avail_out < start_avail_out

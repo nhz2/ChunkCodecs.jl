@@ -15,18 +15,24 @@ end
 
 """
     struct LZ4FrameDecodeOptions <: DecodeOptions
-    LZ4FrameDecodeOptions(::LZ4FrameCodec=LZ4FrameCodec(); kwargs...)
+    LZ4FrameDecodeOptions(; kwargs...)
 
 lz4 frame decompression using liblz4: https://lz4.org/
+
+# Keyword Arguments
+
+- `codec::LZ4FrameCodec=LZ4FrameCodec()`
 """
 struct LZ4FrameDecodeOptions <: DecodeOptions
-    function LZ4FrameDecodeOptions(::LZ4FrameCodec=LZ4FrameCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::LZ4FrameCodec
 end
-codec(::LZ4FrameDecodeOptions) = LZ4FrameCodec()
+function LZ4FrameDecodeOptions(;
+        codec::LZ4FrameCodec=LZ4FrameCodec(),
+        kwargs...
+    )
+    LZ4FrameDecodeOptions(codec)
+end
+
 is_thread_safe(::LZ4FrameDecodeOptions) = true
 
 function try_find_decoded_size(::LZ4FrameDecodeOptions, src::AbstractVector{UInt8})::Nothing
@@ -138,15 +144,20 @@ end
     LZ4BlockDecodeOptions(::LZ4BlockCodec=LZ4BlockCodec(); kwargs...)
 
 lz4 block decompression using liblz4: https://lz4.org/
+
+# Keyword Arguments
+
+- `codec::LZ4BlockCodec=LZ4BlockCodec()`
 """
 struct LZ4BlockDecodeOptions <: DecodeOptions
-    function LZ4BlockDecodeOptions(::LZ4BlockCodec=LZ4BlockCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::LZ4BlockCodec
 end
-codec(::LZ4BlockDecodeOptions) = LZ4BlockCodec()
+function LZ4BlockDecodeOptions(;
+        codec::LZ4BlockCodec=LZ4BlockCodec(),
+        kwargs...
+    )
+    LZ4BlockDecodeOptions(codec)
+end
 is_thread_safe(::LZ4BlockDecodeOptions) = true
 
 # There is no header or footer, so always return nothing
@@ -304,15 +315,21 @@ end
 lz4 numcodecs style compression using liblz4: https://lz4.org/
 
 This is the LZ4 Zarr format described in https://numcodecs.readthedocs.io/en/stable/compression/lz4.html
+
+# Keyword Arguments
+
+- `codec::LZ4ZarrCodec=LZ4ZarrCodec()`
 """
 struct LZ4ZarrDecodeOptions <: DecodeOptions
-    function LZ4ZarrDecodeOptions(::LZ4ZarrCodec=LZ4ZarrCodec();
-            kwargs...
-        )
-        new()
-    end
+    codec::LZ4ZarrCodec
 end
-codec(::LZ4ZarrDecodeOptions) = LZ4ZarrCodec()
+function LZ4ZarrDecodeOptions(;
+        codec::LZ4ZarrCodec=LZ4ZarrCodec(),
+        kwargs...
+    )
+    LZ4ZarrDecodeOptions(codec)
+end
+
 is_thread_safe(::LZ4ZarrDecodeOptions) = true
 
 # There is a 4 byte header with the decoded size as a 32 bit unsigned integer

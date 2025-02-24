@@ -1,27 +1,30 @@
 """
     struct BZ2EncodeOptions <: EncodeOptions
-    BZ2EncodeOptions(::BZ2Codec=BZ2Codec(); kwargs...)
+    BZ2EncodeOptions(; kwargs...)
 
 bzip2 compression using libbzip2: https://sourceware.org/bzip2/
 
 # Keyword Arguments
 
+-`codec::BZ2Codec=BZ2Codec()`
 - `blockSize100k::Integer=9`: Specifies the block size to be used for compression.
 It should be a value between 1 and 9 inclusive, and the actual block size used
 is 100000 x this figure. The default 9 gives the best compression but takes most memory.
 """
 struct BZ2EncodeOptions <: EncodeOptions
+    codec::BZ2Codec
     blockSize100k::Cint
 end
-codec(::BZ2EncodeOptions) = BZ2Codec()
 is_thread_safe(::BZ2EncodeOptions) = true
 
-function BZ2EncodeOptions(::BZ2Codec=BZ2Codec();
+function BZ2EncodeOptions(;
+        codec::BZ2Codec=BZ2Codec(),
         blockSize100k::Integer=9,
         kwargs...
     )
     check_in_range(1:9; blockSize100k)
     BZ2EncodeOptions(
+        codec,
         blockSize100k,
     )
 end

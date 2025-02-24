@@ -10,7 +10,6 @@ using ChunkCodecCore:
     check_contiguous,
     DecodingError
 import ChunkCodecCore:
-    codec,
     decode_options,
     can_concatenate,
     try_decode!,
@@ -27,8 +26,8 @@ export BZ2Codec,
     BZ2DecodingError
 
 # reexport ChunkCodecCore
-using ChunkCodecCore: ChunkCodecCore, encode, decode, codec
-export ChunkCodecCore, encode, decode, codec
+using ChunkCodecCore: ChunkCodecCore, encode, decode
+export ChunkCodecCore, encode, decode
 
 
 include("libbzip2.jl")

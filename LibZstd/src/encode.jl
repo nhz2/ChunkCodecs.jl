@@ -1,9 +1,10 @@
 """
     struct ZstdEncodeOptions <: EncodeOptions
-    ZstdEncodeOptions(::ZstdCodec=ZstdCodec(); kwargs...)
+    ZstdEncodeOptions(; kwargs...)
 
 # Keyword Arguments
 
+- `codec::ZstdCodec=ZstdCodec()`
 - `compressionLevel::Integer=0`: Compression level, regular levels are 1-22.
 Levels ≥ 20 should be used with caution, as they require more memory.
 0 is a special value for `DEFAULT_CLEVEL`.
@@ -19,21 +20,23 @@ are set after the compression level, and checksum options are set,
 so they can override those values.
 """
 struct ZstdEncodeOptions <: EncodeOptions
+    codec::ZstdCodec
     compressionLevel::Cint
     checksum::Bool
     advanced_parameters::Vector{Pair{Cint, Cint}}
 end
-codec(::ZstdEncodeOptions) = ZstdCodec()
+
 is_thread_safe(::ZstdEncodeOptions) = true
 
-function ZstdEncodeOptions(::ZstdCodec=ZstdCodec();
+function ZstdEncodeOptions(;
+        codec::ZstdCodec=ZstdCodec(),
         compressionLevel::Integer=0,
         checksum::Bool=false,
         advanced_parameters::Vector{Pair{Cint, Cint}}=Pair{Cint, Cint}[],
         kwargs...
     )
     _clamped_compression_level = clamp(compressionLevel, MIN_CLEVEL, MAX_CLEVEL)
-    ZstdEncodeOptions(_clamped_compression_level, checksum, advanced_parameters)
+    ZstdEncodeOptions(codec, _clamped_compression_level, checksum, advanced_parameters)
 end
 
 function decoded_size_range(::ZstdEncodeOptions)

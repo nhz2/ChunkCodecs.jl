@@ -61,10 +61,10 @@ true
 Most of the parameters in an `EncodeOptions` are not needed to be able to
 decode back to the original data.
 
-The `Codec` object returned by `codec` has the meta data required for decoding.
+The `Codec` object in the `codec` property has the meta data required for decoding.
 
 ```julia-repl
-julia> gz_codec = codec(e)
+julia> gz_codec = e.codec
 GzipCodec()
 
 julia> gz_codec isa ChunkCodecCore.Codec

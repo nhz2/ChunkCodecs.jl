@@ -24,18 +24,23 @@ end
 
 """
     struct BZ2DecodeOptions <: DecodeOptions
-    BZ2DecodeOptions(::BloscCodec=BloscCodec(); kwargs...)
+    BZ2DecodeOptions(; kwargs...)
 
 bzip2 decompression using libbzip2: https://sourceware.org/bzip2/
+
+# Keyword Arguments
+
+- `codec::BZ2Codec=BZ2Codec()`
 """
 struct BZ2DecodeOptions <: DecodeOptions
-    function BZ2DecodeOptions(::BZ2Codec=BZ2Codec();
-            kwargs...
-        )
-        new()
-    end
+    codec::BZ2Codec
 end
-codec(::BZ2DecodeOptions) = BZ2Codec()
+function BZ2DecodeOptions(;
+        codec::BZ2Codec=BZ2Codec(),
+        kwargs...
+    )
+    BZ2DecodeOptions(codec)
+end
 is_thread_safe(::BZ2DecodeOptions) = true
 
 function try_find_decoded_size(::BZ2DecodeOptions, src::AbstractVector{UInt8})::Nothing

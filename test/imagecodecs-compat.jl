@@ -27,7 +27,7 @@ codecs = [
     for s in decoded_sizes
         im_enc(x) = pyconvert(Vector, im_enc_funct(x; im_options[2]...))
         im_dec(x) = pyconvert(Vector, im_dec_funct(x; out=zeros(UInt8, s), im_options[2]...))
-        jl_dec(x) = decode(codec(jl_options), x; size_hint=s)
+        jl_dec(x) = decode(jl_options.codec, x; size_hint=s)
         jl_enc(x) = encode(jl_options, x)
         local data = rand_test_data(s)
         has_encode, has_decode = if length(im_options) ≤ 2

@@ -13,29 +13,30 @@ function Base.showerror(io::IO, err::BloscDecodingError)
     nothing
 end
 
-struct BloscDecodeOptions <: DecodeOptions
-    numinternalthreads::Cint
-end
-codec(::BloscDecodeOptions) = BloscCodec()
-
 """
     struct BloscDecodeOptions <: DecodeOptions
-    BloscDecodeOptions(::BloscCodec=BloscCodec(); kwargs...)
+    BloscDecodeOptions(; kwargs...)
 
 Blosc decompression using c-blosc library: https://github.com/Blosc/c-blosc
 
 # Keyword Arguments
 
+- `codec::BloscCodec=BloscCodec()`
 - `numinternalthreads::Integer=1`: The number of threads to use internally,
 Must be in `1:$(BLOSC_MAX_THREADS)`.
 
 """
-function BloscDecodeOptions(::BloscCodec=BloscCodec();
+struct BloscDecodeOptions <: DecodeOptions
+    codec::BloscCodec
+    numinternalthreads::Cint
+end
+function BloscDecodeOptions(;
+        codec::BloscCodec=BloscCodec(),
         numinternalthreads::Integer=1,
         kwargs...
     )
     check_in_range(1:BLOSC_MAX_THREADS; numinternalthreads)
-    BloscDecodeOptions(numinternalthreads)
+    BloscDecodeOptions(codec, numinternalthreads)
 end
 
 function try_find_decoded_size(::BloscDecodeOptions, src::AbstractVector{UInt8})::Int64

@@ -11,7 +11,6 @@ using ChunkCodecCore:
     DecodingError
 
 import ChunkCodecCore:
-    codec,
     can_concatenate,
     try_decode!,
     try_encode!,
@@ -35,8 +34,8 @@ public MIN_CLEVEL,
     ZSTD_cParam_getBounds
 
 # reexport ChunkCodecCore
-using ChunkCodecCore: ChunkCodecCore, encode, decode, codec
-export ChunkCodecCore, encode, decode, codec
+using ChunkCodecCore: ChunkCodecCore, encode, decode
+export ChunkCodecCore, encode, decode
 
 
 include("libzstd.jl")
@@ -54,7 +53,7 @@ decompressed size. Decoding will succeed even if the decompressed size is unknow
 Also like libzstd's simple API, decoding accepts concatenated frames 
 and will error if there is invalid data appended.
 
-[`ZlibEncodeOptions`](@ref) and [`ZlibDecodeOptions`](@ref)
+[`ZstdEncodeOptions`](@ref) and [`ZstdDecodeOptions`](@ref)
 can be used to set decoding and encoding options.
 """
 struct ZstdCodec <: Codec

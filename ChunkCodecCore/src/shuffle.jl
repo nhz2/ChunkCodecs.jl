@@ -44,7 +44,7 @@ struct ShuffleCodec <: Codec
     end
 end
 
-decode_options(x::ShuffleCodec) = ShuffleDecodeOptions(x) # default decode options
+decode_options(x::ShuffleCodec) = ShuffleDecodeOptions(;codec=x) # default decode options
 
 # Allow ShuffleCodec to be used as an encoder
 decoded_size_range(::ShuffleCodec) = Int64(0):Int64(1):typemax(Int64)-Int64(1)
@@ -57,7 +57,7 @@ function try_encode!(e::ShuffleCodec, dst::AbstractVector{UInt8}, src::AbstractV
     element_size = e.element_size
     check_in_range(decoded_size_range(e); src_size)
     if dst_size < src_size
-        return nothing
+        nothing
     else
         if src_size>>1 < element_size || element_size == 1
             copyto!(dst, src)
@@ -79,21 +79,23 @@ end
 
 """
     struct ShuffleEncodeOptions <: EncodeOptions
-    ShuffleEncodeOptions(codec::ShuffleCodec; kwargs...)
+    ShuffleEncodeOptions(; kwargs...)
 
 Byte shuffle encoding.
 
-See also [`ShuffleCodec`](@ref)
+# Keyword Arguments
+
+- `codec::ShuffleCodec`
 """
 struct ShuffleEncodeOptions <: EncodeOptions
     codec::ShuffleCodec
-    function ShuffleEncodeOptions(codec::ShuffleCodec;
-            kwargs...
-        )
-        new(codec)
-    end
 end
-codec(x::ShuffleEncodeOptions) = x.codec
+function ShuffleEncodeOptions(;
+        codec::ShuffleCodec,
+        kwargs...
+    )
+    ShuffleEncodeOptions(codec)
+end
 
 is_thread_safe(::ShuffleEncodeOptions) = true
 
@@ -107,21 +109,23 @@ end
 
 """
     struct ShuffleDecodeOptions <: DecodeOptions
-    ShuffleDecodeOptions(codec::ShuffleCodec; kwargs...)
+    ShuffleDecodeOptions(; kwargs...)
 
 Byte shuffle decoding.
 
-See also [`ShuffleCodec`](@ref)
+# Keyword Arguments
+
+- `codec::ShuffleCodec`
 """
 struct ShuffleDecodeOptions <: DecodeOptions
     codec::ShuffleCodec
-    function ShuffleDecodeOptions(codec::ShuffleCodec;
-            kwargs...
-        )
-        new(codec)
-    end
 end
-codec(x::ShuffleDecodeOptions) = x.codec
+function ShuffleDecodeOptions(;
+        codec::ShuffleCodec,
+        kwargs...
+    )
+    ShuffleDecodeOptions(codec)
+end
 
 is_thread_safe(::ShuffleDecodeOptions) = true
 
