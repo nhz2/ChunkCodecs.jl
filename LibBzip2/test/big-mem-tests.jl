@@ -10,9 +10,20 @@ using ChunkCodecLibBzip2:
     encode,
     decode
 using Test: @testset, @test
+using Random
 
 @testset "Big Memory Tests" begin
     Sys.WORD_SIZE == 64 || error("tests require 64 bit word size")
+    let
+        local e = BZ2EncodeOptions(;blockSize100k=1)
+        local n = 2^32-34520475+275580
+        local u = rand(Xoshiro(1234), UInt8, n)
+        local c = encode(e, u)
+        local u2 = decode(e.codec, c; size_hint=n, max_size=n)
+        c = nothing
+        are_equal = u == u2
+        @test are_equal
+    end
     @info "compressing zeros"
     for n in (2^32 - 1, 2^32, 2^32 +1, 2^33)
         @info "compressing"

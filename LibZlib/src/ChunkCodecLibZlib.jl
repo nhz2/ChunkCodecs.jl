@@ -46,12 +46,11 @@ zlib compression using libzlib: https://www.zlib.net/
 
 This is the zlib format described in RFC 1950
 
-[`ZlibEncodeOptions`](@ref) and [`ZlibDecodeOptions`](@ref)
-can be used to set decoding and encoding options.
+See also [`ZlibEncodeOptions`](@ref) and [`ZlibDecodeOptions`](@ref)
 """
 struct ZlibCodec <: Codec
 end
-decode_options(::ZlibCodec) = ZlibDecodeOptions() # default decode options
+decode_options(::ZlibCodec) = ZlibDecodeOptions()
 
 # windowBits setting for the codec
 _windowBits(::ZlibCodec) = Cint(15)
@@ -64,12 +63,11 @@ deflate compression using libzlib: https://www.zlib.net/
 
 This is the deflate format described in RFC 1951
 
-[`DeflateEncodeOptions`](@ref) and [`DeflateDecodeOptions`](@ref)
-can be used to set decoding and encoding options.
+See also [`DeflateEncodeOptions`](@ref) and [`DeflateDecodeOptions`](@ref)
 """
 struct DeflateCodec <: Codec
 end
-decode_options(::DeflateCodec) = DeflateDecodeOptions() # default decode options
+decode_options(::DeflateCodec) = DeflateDecodeOptions()
 
 # windowBits setting for the codec
 _windowBits(::DeflateCodec) = Cint(-15)
@@ -87,7 +85,7 @@ can be used to set decoding and encoding options.
 """
 struct GzipCodec <: Codec
 end
-decode_options(::GzipCodec) = GzipDecodeOptions() # default decode options
+decode_options(::GzipCodec) = GzipDecodeOptions()
 
 # windowBits setting for the codec
 _windowBits(::GzipCodec) = Cint(15+16)
