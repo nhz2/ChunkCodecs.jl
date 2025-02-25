@@ -7,6 +7,8 @@ using ChunkCodecLibZlib:
     ChunkCodecLibZlib,
     GzipCodec,
     GzipEncodeOptions,
+    ZlibEncodeOptions,
+    ZlibCodec,
     encode,
     decode
 using Test: @testset, @test
@@ -14,6 +16,13 @@ using Test: @testset, @test
 @testset "Big Memory Tests" begin
     Sys.WORD_SIZE == 64 || error("tests require 64 bit word size")
     @info "compressing zeros"
+    let
+        local n = 2^32-327671
+        local u = decode(ZlibCodec(), encode(ZlibEncodeOptions(;level=0), zeros(UInt8, n)); size_hint=n, max_size=n)
+        all_zero = all(iszero, u)
+        len_n = length(u) == n
+        @test all_zero && len_n
+    end
     for n in (2^32 - 1, 2^32, 2^32 +1, 2^33)
         @info "compressing"
         local c = encode(GzipEncodeOptions(), zeros(UInt8, n))
