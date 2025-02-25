@@ -4,11 +4,17 @@ using HDF5
 using ChunkCodecs
 using ChunkCodecTests: rand_test_data
 using Test
-# TODO trigger HDF5 filter loading
+# Trigger HDF5 filter loading
+import CodecBzip2
 
 
 # List of encode options and filter ids and client datas
 codecs = [
+    [(
+        ChunkCodecLibBzip2.BZ2EncodeOptions(;blockSize100k),
+        ([UInt16(307)], [[UInt32(blockSize100k)]]),
+        50,
+    ) for blockSize100k in 1:9];
     [(
         ChunkCodecLibZlib.ZlibEncodeOptions(;level),
         ([0x0001], [[UInt32(level)]]),
