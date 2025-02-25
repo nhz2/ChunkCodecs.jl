@@ -10,10 +10,11 @@ This is the zlib format described in RFC 1950
 
 - `codec::ZlibCodec=ZlibCodec()`
 - `level::Integer=-1`: The compression level must be -1, or between 0 and 9.
-1 gives best speed, 9 gives best compression, 0 gives no compression at all
-(the input data is simply copied a block at a time). -1
-requests a default compromise between speed and compression (currently
-equivalent to level 6).
+
+  1 gives best speed, 9 gives best compression, 0 gives no compression at all
+  (the input data is simply copied a block at a time). -1
+  requests a default compromise between speed and compression (currently
+  equivalent to level 6).
 """
 struct ZlibEncodeOptions <: EncodeOptions
     codec::ZlibCodec
@@ -42,10 +43,11 @@ This is the deflate format described in RFC 1951
 
 - `codec::DeflateCodec=DeflateCodec()`
 - `level::Integer=-1`: The compression level must be -1, or between 0 and 9.
-1 gives best speed, 9 gives best compression, 0 gives no compression at all
-(the input data is simply copied a block at a time). -1
-requests a default compromise between speed and compression (currently
-equivalent to level 6).
+
+  1 gives best speed, 9 gives best compression, 0 gives no compression at all
+  (the input data is simply copied a block at a time). -1
+  requests a default compromise between speed and compression (currently
+  equivalent to level 6).
 """
 struct DeflateEncodeOptions <: EncodeOptions
     codec::DeflateCodec
@@ -74,10 +76,11 @@ This is the gzip (.gz) format described in RFC 1952
 
 - `codec::GzipCodec=GzipCodec()`
 - `level::Integer=-1`: The compression level must be -1, or between 0 and 9.
-1 gives best speed, 9 gives best compression, 0 gives no compression at all
-(the input data is simply copied a block at a time). -1
-requests a default compromise between speed and compression (currently
-equivalent to level 6).
+
+  1 gives best speed, 9 gives best compression, 0 gives no compression at all
+  (the input data is simply copied a block at a time). -1
+  requests a default compromise between speed and compression (currently
+  equivalent to level 6).
 """
 struct GzipEncodeOptions <: EncodeOptions
     codec::GzipCodec

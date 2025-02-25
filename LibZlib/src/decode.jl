@@ -132,41 +132,41 @@ function try_resize_decode!(d::_AllDecodeOptions, dst::AbstractVector{UInt8}, sr
                         stream, Z_NO_FLUSH,
                     )
                     # @info (;ret, stream.avail_in, stream.avail_out)
-                    if ret == Z_OK || ret == Z_STREAM_END
+                    if ret == Z_OK || ret == Z_STREAM_END || ret == Z_BUF_ERROR
                         @assert stream.avail_in ≤ start_avail_in
                         @assert stream.avail_out ≤ start_avail_out
                         dst_left -= start_avail_out - stream.avail_out
                         src_left -= start_avail_in - stream.avail_in
                         @assert src_left ∈ 0:src_size
                         @assert dst_left ∈ 0:dst_size
-                        @assert stream.next_in == src_p + (src_size - src_left)
-                        @assert stream.next_out == dst_p + (dst_size - dst_left)
                     end
                     if ret == Z_OK || ret == Z_BUF_ERROR
-                        if iszero(stream.avail_out) # needs more output
-                            if iszero(dst_left)
-                                # grow dst or return nothing
-                                if dst_size ≥ max_size
-                                    return nothing
-                                end
-                                # This inequality prevents overflow
-                                local next_size = if max_size - dst_size ≤ dst_size
-                                    max_size
-                                else
-                                    max(2*dst_size, Int64(1))
-                                end
-                                resize!(dst, next_size)
-                                dst_left += next_size - dst_size
-                                dst_size = next_size
-                                @assert dst_left > 0
-                            end
-                        else # needs more input
-                            if iszero(src_left)
-                                throw(LibzDecodingError("unexpected end of stream"))
-                            end
+                        if (
+                                iszero(stream.avail_out) && !iszero(dst_left) ||
+                                iszero(stream.avail_in) && !iszero(src_left) ||
+                                !iszero(src_left) && !iszero(dst_left)
+                            )
                             # there must be progress
                             @assert ret != Z_BUF_ERROR
                             @assert stream.avail_in < start_avail_in || stream.avail_out < start_avail_out
+                        elseif iszero(dst_left) # needs more output
+                            # grow dst or return nothing
+                            if dst_size ≥ max_size
+                                return nothing
+                            end
+                            # This inequality prevents overflow
+                            local next_size = if max_size - dst_size ≤ dst_size
+                                max_size
+                            else
+                                max(2*dst_size, Int64(1))
+                            end
+                            resize!(dst, next_size)
+                            dst_left += next_size - dst_size
+                            dst_size = next_size
+                            @assert dst_left > 0
+                        else
+                            @assert iszero(src_left) && !iszero(stream.avail_out)
+                            throw(LibzDecodingError("unexpected end of stream"))
                         end
                     elseif ret == Z_STREAM_END
                         if iszero(src_left)
@@ -193,7 +193,11 @@ function try_resize_decode!(d::_AllDecodeOptions, dst::AbstractVector{UInt8}, sr
                     elseif ret == Z_NEED_DICT
                         throw(LibzDecodingError("Z_NEED_DICT: a preset dictionary is needed at this point"))
                     elseif ret == Z_DATA_ERROR
-                        throw(LibzDecodingError(unsafe_string(stream.msg)))
+                        if stream.msg == C_NULL
+                            throw(LibzDecodingError("unknown Z_DATA_ERROR"))
+                        else
+                            throw(LibzDecodingError(unsafe_string(stream.msg)))
+                        end
                     elseif ret == Z_MEM_ERROR
                         throw(OutOfMemoryError())
                     else

@@ -60,6 +60,9 @@ function try_resize_decode!(d::BZ2DecodeOptions, dst::AbstractVector{UInt8}, src
     dst_left::Int64 = dst_size
     check_contiguous(dst)
     check_contiguous(src)
+    if isempty(src)
+        throw(BZ2DecodingError(BZ_UNEXPECTED_EOF))
+    end
     cconv_src = Base.cconvert(Ptr{UInt8}, src)
     # This outer loop is to decode a concatenation of multiple compressed streams.
     while true
@@ -88,33 +91,33 @@ function try_resize_decode!(d::BZ2DecodeOptions, dst::AbstractVector{UInt8}, src
                         src_left -= start_avail_in - stream.avail_in
                         @assert src_left ∈ 0:src_size
                         @assert dst_left ∈ 0:dst_size
-                        @assert stream.next_in == src_p + (src_size - src_left)
-                        @assert stream.next_out == dst_p + (dst_size - dst_left)
                     end
                     if ret == BZ_OK
-                        if iszero(stream.avail_out) # needs more output
-                            if iszero(dst_left)
-                                # grow dst or return nothing
-                                if dst_size ≥ max_size
-                                    return nothing
-                                end
-                                # This inequality prevents overflow
-                                local next_size = if max_size - dst_size ≤ dst_size
-                                    max_size
-                                else
-                                    max(2*dst_size, Int64(1))
-                                end
-                                resize!(dst, next_size)
-                                dst_left += next_size - dst_size
-                                dst_size = next_size
-                                @assert dst_left > 0
-                            end
-                        else # needs more input
-                            if iszero(src_left)
-                                throw(BZ2DecodingError(BZ_UNEXPECTED_EOF))
-                            end
+                        if (
+                                iszero(stream.avail_out) && !iszero(dst_left) ||
+                                iszero(stream.avail_in) && !iszero(src_left) ||
+                                !iszero(src_left) && !iszero(dst_left)
+                            )
                             # there must be progress
                             @assert stream.avail_in < start_avail_in || stream.avail_out < start_avail_out
+                        elseif iszero(dst_left) # needs more output
+                            # grow dst or return nothing
+                            if dst_size ≥ max_size
+                                return nothing
+                            end
+                            # This inequality prevents overflow
+                            local next_size = if max_size - dst_size ≤ dst_size
+                                max_size
+                            else
+                                max(2*dst_size, Int64(1))
+                            end
+                            resize!(dst, next_size)
+                            dst_left += next_size - dst_size
+                            dst_size = next_size
+                            @assert dst_left > 0
+                        else
+                            @assert iszero(src_left) && !iszero(stream.avail_out)
+                            throw(BZ2DecodingError(BZ_UNEXPECTED_EOF))
                         end
                     elseif ret == BZ_STREAM_END
                         if iszero(src_left)
