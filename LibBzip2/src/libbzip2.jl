@@ -141,18 +141,18 @@ end
 function BZ2_bzDecompressInit(stream::BZStream)
     @static if WIN32
         ret = ccall(
-                ("BZ2_bzDecompressInit@12", libbzip2),
-                stdcall,
-                Cint,
-                (Ref{BZStream}, Cint, Cint),
-                stream, 0, 0,
+            ("BZ2_bzDecompressInit@12", libbzip2),
+            stdcall,
+            Cint,
+            (Ref{BZStream}, Cint, Cint),
+            stream, 0, 0,
         )
     else
         ret = ccall(
-                (:BZ2_bzDecompressInit, libbzip2),
-                Cint,
-                (Ref{BZStream}, Cint, Cint),
-                stream, 0, 0,
+            (:BZ2_bzDecompressInit, libbzip2),
+            Cint,
+            (Ref{BZStream}, Cint, Cint),
+            stream, 0, 0,
         )
     end
     # error out if init failed

@@ -8,12 +8,13 @@ bzip2 compression using libbzip2: https://sourceware.org/bzip2/
 
 -`codec::BZ2Codec=BZ2Codec()`
 - `blockSize100k::Integer=9`: Specifies the block size to be used for compression.
-It should be a value between 1 and 9 inclusive, and the actual block size used
-is 100000 x this figure. The default 9 gives the best compression but takes most memory.
+
+  It should be a value between 1 and 9 inclusive, and the actual block size used
+  is 100000 x this figure. The default 9 gives the best compression but takes most memory.
 """
 struct BZ2EncodeOptions <: EncodeOptions
     codec::BZ2Codec
-    blockSize100k::Cint
+    blockSize100k::Int32
 end
 is_thread_safe(::BZ2EncodeOptions) = true
 
@@ -76,6 +77,7 @@ function try_encode!(e::BZ2EncodeOptions, dst::AbstractVector{UInt8}, src::Abstr
                     BZ_RUN
                 end
                 ret = BZ2_bzCompress(stream, action)
+                @assert ret != BZ_PARAM_ERROR # state not clobbered
                 @assert stream.avail_in ≤ start_avail_in
                 @assert stream.avail_out ≤ start_avail_out
                 # there must be progress

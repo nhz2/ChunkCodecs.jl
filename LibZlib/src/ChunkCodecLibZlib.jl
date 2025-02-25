@@ -80,8 +80,7 @@ gzip compression using libzlib: https://www.zlib.net/
 
 This is the gzip (.gz) format described in RFC 1952
 
-[`GzipEncodeOptions`](@ref) and [`GzipDecodeOptions`](@ref)
-can be used to set decoding and encoding options.
+See also [`GzipEncodeOptions`](@ref) and [`GzipDecodeOptions`](@ref)
 """
 struct GzipCodec <: Codec
 end
