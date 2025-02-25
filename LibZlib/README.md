@@ -24,3 +24,5 @@ julia> data == decompressed_data
 true
 ```
 
+The low level interface is defined in the `ChunkCodecCore` package.
+
