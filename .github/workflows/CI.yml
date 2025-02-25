@@ -13,20 +13,56 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 jobs:
+  # JOB to run change detection
+  changes:
+    runs-on: ubuntu-latest
+    # Required permissions
+    permissions:
+      pull-requests: read
+    outputs:
+      # Expose matched filters as job 'packages' output variable
+      packages: ${{ steps.filter.outputs.changes }}
+    steps:
+    # For pull requests it's not necessary to checkout the code
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          ChunkCodecCore:
+            - ChunkCodecCore/**
+            - ChunkCodecTests/**
+          ChunkCodecs:
+            - ./**
+          LibBlosc:
+            - ChunkCodecCore/**
+            - ChunkCodecTests/**
+            - LibBlosc/**
+          LibBzip2:
+            - ChunkCodecCore/**
+            - ChunkCodecTests/**
+            - LibBzip2/**
+          LibLz4:
+            - ChunkCodecCore/**
+            - ChunkCodecTests/**
+            - LibLz4/**
+          LibZlib:
+            - ChunkCodecCore/**
+            - ChunkCodecTests/**
+            - LibZlib/**
+          LibZstd:
+            - ChunkCodecCore/**
+            - ChunkCodecTests/**
+            - LibZstd/**
   test:
     name: Julia ${{ matrix.version }} - ${{matrix.package}} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
+    needs: changes
     strategy:
       fail-fast: false
       matrix:
-        package:
-          - 'LibBlosc'
-          - 'ChunkCodecCore'
-          - 'LibBzip2'
-          - 'LibLz4'
-          - 'LibZlib'
-          - 'LibZstd'
-          - 'ChunkCodecs'
+        # Parse JSON array containing names of all filters matching any of changed files
+        # e.g. ['package1', 'package2'] if both package folders contains changes
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
         version:
           - '1'
         os:
