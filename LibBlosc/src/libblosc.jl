@@ -1,7 +1,6 @@
 # Constants and c wrapper functions ported to Julia from blosc.h https://github.com/Blosc/c-blosc/blob/3455c3810279ce709cf02f45beddbb31af418ab6/blosc/blosc.h
 
-# The *_FORMAT symbols should be just 1-byte long
-const BLOSC_VERSION_FORMAT   = Int64(2)   # Blosc format version, starting at 1
+# `compcode` and `compname` functions are from https://github.com/JuliaIO/Blosc.jl/blob/25d663c607542cbebaea45542619726fec71bb5e/src/Blosc.jl#L339C1-L362C4
 
 # Minimum header length
 const BLOSC_MIN_HEADER_LENGTH = Int64(16)
@@ -23,13 +22,41 @@ const BLOSC_SHUFFLE    = Int64(1)  # byte-wise shuffle
 const BLOSC_BITSHUFFLE = Int64(2)  # bit-wise shuffle
 
 """
-    is_compressor_valid(cname::String)::Bool
+    is_compressor_valid(s::AbstractString)::Bool
 
 Check if a compressor name is valid.
 """
-function is_compressor_valid(cname::String)
-    ret = ccall((:blosc_compname_to_compcode, libblosc), Cint, (Cstring,), cname)
-    ret != -1
+function is_compressor_valid(s::AbstractString)
+    '\0' ∈ s && return false
+    ret = ccall((:blosc_compname_to_compcode, libblosc), Cint, (Cstring,), s)
+    return ret != -1
+end
+
+# From https://github.com/JuliaIO/Blosc.jl/blob/25d663c607542cbebaea45542619726fec71bb5e/src/Blosc.jl#L339C1-L362C4
+"""
+    compcode(s::AbstractString)
+
+Return a nonnegative integer code used internally by Blosc to identify the compressor.
+Throws an `ArgumentError` if `s` is not the name of a supported algorithm.
+"""
+function compcode(s::AbstractString)
+    compcode = ccall((:blosc_compname_to_compcode, libblosc), Cint, (Cstring,), s)
+    compcode == -1 && throw(ArgumentError("unrecognized compressor $(repr(s))"))
+    compcode
+end
+
+# From https://github.com/JuliaIO/Blosc.jl/blob/25d663c607542cbebaea45542619726fec71bb5e/src/Blosc.jl#L339C1-L362C4
+"""
+    compname(compcode::Integer)
+
+Return the compressor name corresponding to the internal integer code used by Blosc.
+Throws an `ArgumentError` if `compcode` is not a valid code.
+"""
+function compname(compcode::Integer)
+    refstr = Ref(Ptr{UInt8}(0))
+    retcode = ccall((:blosc_compcode_to_compname, libblosc), Cint, (Cint, Ref{Ptr{UInt8}}), compcode, refstr)
+    retcode == -1 && throw(ArgumentError("unrecognized compcode $compcode"))
+    unsafe_string(refstr[])
 end
 
 
