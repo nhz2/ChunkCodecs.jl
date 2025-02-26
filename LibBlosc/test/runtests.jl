@@ -15,25 +15,23 @@ Aqua.test_all(ChunkCodecLibBlosc; persistent_tasks = false)
 Random.seed!(1234)
 
 @testset "default" begin
-    test_codec(BloscCodec(), BloscEncodeOptions(), BloscDecodeOptions())
-end
-@testset "multithreaded" begin
-    for i in 1:3
-        for j in 1:3
-            test_codec(BloscCodec(), BloscEncodeOptions(;numinternalthreads=i), BloscDecodeOptions(;numinternalthreads=j))
-        end
-    end
+    test_codec(BloscCodec(), BloscEncodeOptions(), BloscDecodeOptions(); trials=100)
 end
 @testset "typesize" begin
     for i in 1:50
         test_codec(BloscCodec(), BloscEncodeOptions(;typesize=i), BloscDecodeOptions(); trials=10)
     end
 end
-@testset "invalid encoding options" begin
-    @test_throws ArgumentError BloscDecodeOptions(;numinternalthreads=10000)
-    @test_throws ArgumentError BloscDecodeOptions(;numinternalthreads=0)
-    @test_throws ArgumentError BloscEncodeOptions(;clevel=-1)
-    @test_throws ArgumentError BloscEncodeOptions(;clevel=100)
+@testset "compressors" begin
+    for clevel in 0:9
+        for compressor in ["blosclz", "lz4", "lz4hc", "zlib", "zstd"]
+            test_codec(BloscCodec(), BloscEncodeOptions(;compressor, clevel), BloscDecodeOptions(); trials=10)
+        end
+    end
+end
+@testset "invalid options" begin
+    @test BloscEncodeOptions(;clevel=-1).clevel == 0
+    @test BloscEncodeOptions(;clevel=100).clevel == 9
     # typesize can be anything, but out of the range it gets set to 1
     e = BloscEncodeOptions(;typesize=typemax(UInt128))
     @test e.typesize == 1
@@ -48,6 +46,19 @@ end
     @test_throws ArgumentError BloscEncodeOptions(;compressor="")
     @test_throws ArgumentError BloscEncodeOptions(;compressor="asfdgfsdgrwwea")
     @test_throws ArgumentError BloscEncodeOptions(;compressor="blosclz,")
+    @test_throws ArgumentError BloscEncodeOptions(;compressor="blosclz\0")
+end
+@testset "compcode and compname" begin
+    @test ChunkCodecLibBlosc.compcode("blosclz") == 0
+    @test ChunkCodecLibBlosc.is_compressor_valid("blosclz")
+    @test ChunkCodecLibBlosc.compname(0) == "blosclz"
+
+    @test_throws ArgumentError ChunkCodecLibBlosc.compcode("sdaffads")
+    @test !ChunkCodecLibBlosc.is_compressor_valid("sdaffads")
+    @test_throws ArgumentError ChunkCodecLibBlosc.compcode("sdaffads")
+    @test_throws ArgumentError ChunkCodecLibBlosc.compname(100)
+
+    @test !ChunkCodecLibBlosc.is_compressor_valid("\0")
 end
 @testset "errors" begin
     # check BloscDecodingError prints the correct error message

@@ -22,28 +22,22 @@ Blosc decompression using c-blosc library: https://github.com/Blosc/c-blosc
 # Keyword Arguments
 
 - `codec::BloscCodec=BloscCodec()`
-- `numinternalthreads::Integer=1`: The number of threads to use internally,
-Must be in `1:$(BLOSC_MAX_THREADS)`.
-
 """
 struct BloscDecodeOptions <: DecodeOptions
     codec::BloscCodec
-    numinternalthreads::Cint
 end
 function BloscDecodeOptions(;
         codec::BloscCodec=BloscCodec(),
-        numinternalthreads::Integer=1,
         kwargs...
     )
-    check_in_range(1:BLOSC_MAX_THREADS; numinternalthreads)
-    BloscDecodeOptions(codec, numinternalthreads)
+    BloscDecodeOptions(codec)
 end
 
 function try_find_decoded_size(::BloscDecodeOptions, src::AbstractVector{UInt8})::Int64
     check_contiguous(src)
     nbytes = Ref(Csize_t(0))
     ret = ccall((:blosc_cbuffer_validate, libblosc), Cint,
-        (Ptr{Cvoid}, Csize_t, Ptr{Csize_t}),
+        (Ptr{Cvoid}, Csize_t, Ref{Csize_t}),
         src, length(src), nbytes
     )
     if iszero(ret) && nbytes[] ≤ typemax(Int64)
@@ -64,9 +58,10 @@ function try_decode!(d::BloscDecodeOptions, dst::AbstractVector{UInt8}, src::Abs
     if nbytes > dst_size
         nothing
     else
+        numinternalthreads = 1
         sz = ccall((:blosc_decompress_ctx, libblosc), Cint,
             (Ptr{Cvoid}, Ptr{Cvoid}, Csize_t, Cint),
-            src, dst, dst_size, d.numinternalthreads
+            src, dst, dst_size, numinternalthreads
         )
         if sz == nbytes
             nbytes

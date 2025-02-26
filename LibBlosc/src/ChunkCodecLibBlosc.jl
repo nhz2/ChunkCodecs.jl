@@ -22,7 +22,7 @@ export BloscCodec,
     BloscDecodeOptions,
     BloscDecodingError
 
-public is_compressor_valid
+public is_compressor_valid, compcode, compname
 
 # reexport ChunkCodecCore
 using ChunkCodecCore: ChunkCodecCore, encode, decode
@@ -43,7 +43,7 @@ Decoding also does not accept truncated data, or multiple compressed blocks conc
 can be used to set decoding and encoding options.
 """
 struct BloscCodec <: Codec end
-decode_options(::BloscCodec) = BloscDecodeOptions() # default decode options
+decode_options(::BloscCodec) = BloscDecodeOptions()
 
 include("encode.jl")
 include("decode.jl")
