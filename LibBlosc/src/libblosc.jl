@@ -2,6 +2,9 @@
 
 # `compcode` and `compname` functions are from https://github.com/JuliaIO/Blosc.jl/blob/25d663c607542cbebaea45542619726fec71bb5e/src/Blosc.jl#L339C1-L362C4
 
+# The *_FORMAT symbols should be just 1-byte long
+const BLOSC_VERSION_FORMAT   = Int64(2)   # Blosc format version, starting at 1
+
 # Minimum header length
 const BLOSC_MIN_HEADER_LENGTH = Int64(16)
 

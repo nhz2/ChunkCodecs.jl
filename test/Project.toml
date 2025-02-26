@@ -1,6 +1,7 @@
 [deps]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+Blosc = "a74b3585-a348-5f62-a45c-50e91977d574"
 ChunkCodecCore = "0b6fb165-00bc-4d37-ab8b-79f91016dbe1"
 ChunkCodecLibBlosc = "c6a955be-ab7f-4fbb-b38f-caf93db6b928"
 ChunkCodecLibBzip2 = "2b723af9-f480-4e8d-a1e4-4a9f5a906122"

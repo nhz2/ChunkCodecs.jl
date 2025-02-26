@@ -6,10 +6,16 @@ using ChunkCodecTests: rand_test_data
 using Test
 # Trigger HDF5 filter loading
 import CodecBzip2
+import Blosc
 
 
 # List of encode options and filter ids and client datas
 codecs = [
+    [(
+        ChunkCodecLibBlosc.BloscEncodeOptions(;),
+        ([UInt16(32001)], [[UInt32(2),UInt32(2)]]),
+        200,
+    )];
     [(
         ChunkCodecLibBzip2.BZ2EncodeOptions(;blockSize100k),
         ([UInt16(307)], [[UInt32(blockSize100k)]]),
