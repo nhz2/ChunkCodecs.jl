@@ -1,7 +1,6 @@
 # ChunkCodecs (WIP)
 
 [![CI](https://github.com/nhz2/ChunkCodecs.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/nhz2/ChunkCodecs.jl/actions/workflows/CI.yml)
-[![codecov](https://codecov.io/github/nhz2/ChunkCodecs.jl/graph/badge.svg?token=6SPQQCHA0B)](https://codecov.io/github/nhz2/ChunkCodecs.jl)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
 ## Warning: ChunkCodecs is currently a WIP and its API may drastically change at any time.
