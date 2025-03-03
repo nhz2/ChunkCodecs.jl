@@ -70,9 +70,9 @@ end
 
 All parameters must belong to an interval with lower and upper bounds,
 otherwise they will either trigger an error or be automatically clamped.
-Return : a structure, `ZSTD_bounds`, which contains
-        - an error status field, which must be tested using `ZSTD_isError()`
-        - lower and upper bounds, both inclusive
+Return : a structure, [`ZSTD_bounds`](@ref), which contains
+- an error status field, which must be tested using [`ZSTD_isError`](@ref)
+- lower and upper bounds, both inclusive
 """
 function ZSTD_cParam_getBounds(cParam::Int32)
     ccall((:ZSTD_cParam_getBounds, libzstd), ZSTD_bounds, (Cint,), cParam)
@@ -83,9 +83,9 @@ end
 
 All parameters must belong to an interval with lower and upper bounds,
 otherwise they will either trigger an error or be automatically clamped.
-Return : a structure, `ZSTD_bounds`, which contains
-        - an error status field, which must be tested using `ZSTD_isError()`
-        - lower and upper bounds, both inclusive
+Return : a structure, [`ZSTD_bounds`](@ref), which contains
+- an error status field, which must be tested using [`ZSTD_isError`](@ref)
+- lower and upper bounds, both inclusive
 """
 function ZSTD_dParam_getBounds(dParam::Int32)
     ccall((:ZSTD_dParam_getBounds, libzstd), ZSTD_bounds, (Cint,), dParam)
