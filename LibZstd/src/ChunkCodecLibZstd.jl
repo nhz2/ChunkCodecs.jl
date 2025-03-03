@@ -25,13 +25,14 @@ export ZstdCodec,
     ZstdDecodeOptions,
     ZstdDecodingError
 
-public MIN_CLEVEL,
-    MAX_CLEVEL,
-    DEFAULT_CLEVEL,
-    ZSTD_VERSION,
+public ZSTD_minCLevel,
+    ZSTD_maxCLevel,
+    ZSTD_defaultCLevel,
+    ZSTD_versionNumber,
     ZSTD_isError,
     ZSTD_bounds,
-    ZSTD_cParam_getBounds
+    ZSTD_cParam_getBounds,
+    ZSTD_dParam_getBounds
 
 # reexport ChunkCodecCore
 using ChunkCodecCore: ChunkCodecCore, encode, decode
@@ -53,12 +54,11 @@ decompressed size. Decoding will succeed even if the decompressed size is unknow
 Also like libzstd's simple API, decoding accepts concatenated frames 
 and will error if there is invalid data appended.
 
-[`ZstdEncodeOptions`](@ref) and [`ZstdDecodeOptions`](@ref)
-can be used to set decoding and encoding options.
+See also [`ZstdEncodeOptions`](@ref) and [`ZstdDecodeOptions`](@ref)
 """
 struct ZstdCodec <: Codec
 end
-decode_options(::ZstdCodec) = ZstdDecodeOptions() # default decode options
+decode_options(::ZstdCodec) = ZstdDecodeOptions()
 can_concatenate(::ZstdCodec) = true
 
 include("encode.jl")

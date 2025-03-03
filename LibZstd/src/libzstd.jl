@@ -2,27 +2,99 @@
 # https://github.com/facebook/zstd/blob/v1.5.6/lib/zstd.h
 # https://github.com/facebook/zstd/blob/v1.5.6/lib/zstd_errors.h
 
-const MIN_CLEVEL::Cint = ccall((:ZSTD_minCLevel, libzstd), Cint, ())
-const MAX_CLEVEL::Cint = ccall((:ZSTD_maxCLevel, libzstd), Cint, ())
-const DEFAULT_CLEVEL::Cint = ccall((:ZSTD_defaultCLevel, libzstd), Cint, ())
-const ZSTD_VERSION::VersionNumber = let
-    local v = ccall((:ZSTD_versionNumber, libzstd), Cuint, ())
-    local major = v ÷ 100_00
-    local minor = (v ÷ 100) % 100
-    local patch = v % 100
+"""
+    ZSTD_minCLevel()::Int32
+
+Return the minimum negative compression level allowed.
+"""
+function ZSTD_minCLevel()::Int32
+    ccall((:ZSTD_minCLevel, libzstd), Cint, ())
+end
+
+"""
+    ZSTD_maxCLevel()::Int32
+
+Return the maximum compression level available.
+"""
+function ZSTD_maxCLevel()::Int32
+    ccall((:ZSTD_maxCLevel, libzstd), Cint, ())
+end
+
+"""
+    ZSTD_defaultCLevel()::Int32
+
+Return the default compression level.
+"""
+function ZSTD_defaultCLevel()::Int32
+    ccall((:ZSTD_defaultCLevel, libzstd), Cint, ())
+end
+
+"""
+    ZSTD_versionNumber()::VersionNumber
+
+Return the zstd runtime library version.
+"""
+function ZSTD_versionNumber()::VersionNumber
+    v = ccall((:ZSTD_versionNumber, libzstd), Cuint, ())
+    major = v ÷ 100_00
+    minor = (v ÷ 100) % 100
+    patch = v % 100
     VersionNumber(major, minor, patch)
 end
-@assert Culonglong == UInt64
-const ZSTD_CONTENTSIZE_UNKNOWN = -1%UInt64
 
 """
     ZSTD_isError(ret::Csize_t)::Bool
 
-Return true if return `ret` is an error
+Return true if return `ret` is an error.
 """
 function ZSTD_isError(ret::Csize_t)::Bool
     !iszero(ccall((:ZSTD_isError, libzstd), Cuint, (Csize_t,), ret))
 end
+
+"""
+    struct ZSTD_bounds
+
+Has the following fields:
+- `error::Csize_t`
+- `lowerBound::Cint`
+- `upperBound::Cint`
+"""
+struct ZSTD_bounds
+    error::Csize_t
+    lowerBound::Cint
+    upperBound::Cint
+end
+
+"""
+    ZSTD_cParam_getBounds(cParam::Int32)::ZSTD_bounds
+
+All parameters must belong to an interval with lower and upper bounds,
+otherwise they will either trigger an error or be automatically clamped.
+Return : a structure, `ZSTD_bounds`, which contains
+        - an error status field, which must be tested using `ZSTD_isError()`
+        - lower and upper bounds, both inclusive
+"""
+function ZSTD_cParam_getBounds(cParam::Int32)
+    ccall((:ZSTD_cParam_getBounds, libzstd), ZSTD_bounds, (Cint,), cParam)
+end
+
+"""
+    ZSTD_dParam_getBounds(dParam::Int32)::ZSTD_bounds
+
+All parameters must belong to an interval with lower and upper bounds,
+otherwise they will either trigger an error or be automatically clamped.
+Return : a structure, `ZSTD_bounds`, which contains
+        - an error status field, which must be tested using `ZSTD_isError()`
+        - lower and upper bounds, both inclusive
+"""
+function ZSTD_dParam_getBounds(dParam::Int32)
+    ccall((:ZSTD_dParam_getBounds, libzstd), ZSTD_bounds, (Cint,), dParam)
+end
+
+
+@assert Culonglong == UInt64
+const ZSTD_CONTENTSIZE_UNKNOWN = -1%UInt64
+const ZSTD_CONTENTSIZE_ERROR   = -2%UInt64
 
 # convert a result into an error code, which can be compared to error enum list
 function ZSTD_getErrorCode(ret::Csize_t)::Cint
@@ -72,37 +144,6 @@ end
     # ZSTD_error_maxCode = 120
 end
 
-struct ZSTD_bounds
-    error::Csize_t
-    lowerBound::Cint
-    upperBound::Cint
-end
-
-"""
-    ZSTD_cParam_getBounds(cParam::Cint)::ZSTD_bounds
-
-All parameters must belong to an interval with lower and upper bounds,
-otherwise they will either trigger an error or be automatically clamped.
-Return : a structure, `ZSTD_bounds`, which contains
-        - an error status field, which must be tested using `ZSTD_isError()`
-        - lower and upper bounds, both inclusive
-"""
-function ZSTD_cParam_getBounds(cParam::Cint)
-    ccall((:ZSTD_cParam_getBounds, libzstd), ZSTD_bounds, (Cint,), cParam)
-end
-
-"""
-    ZSTD_dParam_getBounds(dParam::Cint)::ZSTD_bounds
-
-All parameters must belong to an interval with lower and upper bounds,
-otherwise they will either trigger an error or be automatically clamped.
-Return : a structure, `ZSTD_bounds`, which contains
-        - an error status field, which must be tested using `ZSTD_isError()`
-        - lower and upper bounds, both inclusive
-"""
-function ZSTD_dParam_getBounds(dParam::Cint)
-    ccall((:ZSTD_dParam_getBounds, libzstd), ZSTD_bounds, (Cint,), dParam)
-end
 
 
 # Just used to mark the type of pointers

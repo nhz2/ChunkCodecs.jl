@@ -21,21 +21,27 @@ end
     struct ZstdDecodeOptions <: DecodeOptions
     ZstdDecodeOptions(; kwargs...)
 
+Zstandard decompression using libzstd: www.zstd.net
+
+Zstandard's format is documented in [RFC8878](https://datatracker.ietf.org/doc/html/rfc8878)
+
 # Keyword Arguments
 
 - `codec::ZstdCodec=ZstdCodec()`
-- `advanced_parameters::Vector{Pair{Cint, Cint}}=[]`:
-Warning, some parameters are experimental and may change in new versions of libzstd,
-so you may need to check `ZSTD_VERSION`. See comments in zstd.h.
-Additional parameters are set with `ZSTD_DCtx_setParameter`.
+- `advanced_parameters::Vector{Pair{Int32, Int32}}=[]`: Pairs of `param => value`.
+
+  Warning, some parameters are experimental and may change in new versions of libzstd,
+  so you may need to check `ZSTD_versionNumber()`. See comments in zstd.h.
+  Additional parameters are set with `ZSTD_DCtx_setParameter`.
+  The vector must not be mutated after calling the constructor.
 """
 struct ZstdDecodeOptions <: DecodeOptions
     codec::ZstdCodec
-    advanced_parameters::Vector{Pair{Cint, Cint}}
+    advanced_parameters::Vector{Pair{Int32, Int32}}
 end
 function ZstdDecodeOptions(;
         codec::ZstdCodec=ZstdCodec(),
-        advanced_parameters::Vector{Pair{Cint, Cint}}=Pair{Cint, Cint}[],
+        advanced_parameters::Vector{Pair{Int32, Int32}}=Pair{Int32, Int32}[],
         kwargs...
     )
     ZstdDecodeOptions(codec, advanced_parameters)
@@ -97,7 +103,7 @@ function try_decode!(d::ZstdDecodeOptions, dst::AbstractVector{UInt8}, src::Abst
     if isempty(src)
         throw(ZstdDecodingError(:src_empty))
     end
-    # create ZSTD_CCtx
+    # create ZSTD_DCtx
     dctx = ccall((:ZSTD_createDCtx, libzstd), Ptr{ZSTD_DCtx}, ())
     if dctx == C_NULL
         throw(OutOfMemoryError())
@@ -105,7 +111,7 @@ function try_decode!(d::ZstdDecodeOptions, dst::AbstractVector{UInt8}, src::Abst
     try
         # set parameters
         for (param, value) in d.advanced_parameters
-            _set_parameter(dctx, param, value)
+            _set_parameter(dctx, Cint(param), Cint(value))
         end
         # do decompression
         ret = ccall((:ZSTD_decompressDCtx, libzstd), Csize_t,
@@ -127,13 +133,12 @@ function try_decode!(d::ZstdDecodeOptions, dst::AbstractVector{UInt8}, src::Abst
         end
     finally
         # free ZSTD_DCtx
-        ret = ccall((:ZSTD_freeDCtx, libzstd), Csize_t, (Ptr{ZSTD_DCtx},), dctx)
-        @assert ret == 0 "ZSTD_freeDCtx should never fail here"
+        ccall((:ZSTD_freeDCtx, libzstd), Csize_t, (Ptr{ZSTD_DCtx},), dctx)
     end
 end
 
 # For now rely on fallback `try_resize_decode!`
-# Incase `try_find_decoded_size` returns `nothing`, the fall back repeatedly 
+# Incase `try_find_decoded_size` returns `nothing`, the fallback repeatedly 
 # calls `try_decode!` with larger and larger `dst`.
 # This isn't ideal, but in a chunk decoding context
 # the decoded size is typically found by `try_find_decoded_size`.
