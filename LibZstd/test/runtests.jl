@@ -5,7 +5,15 @@ using ChunkCodecLibZstd:
     ZstdCodec,
     ZstdEncodeOptions,
     ZstdDecodeOptions,
-    ZstdDecodingError
+    ZstdDecodingError,
+    ZSTD_minCLevel,
+    ZSTD_maxCLevel,
+    ZSTD_defaultCLevel,
+    ZSTD_versionNumber,
+    ZSTD_isError,
+    ZSTD_bounds,
+    ZSTD_cParam_getBounds,
+    ZSTD_dParam_getBounds
 using ChunkCodecTests: test_codec
 using Test: @testset, @test_throws, @test
 using Aqua: Aqua
@@ -13,6 +21,19 @@ using Aqua: Aqua
 Aqua.test_all(ChunkCodecLibZstd; persistent_tasks = false)
 
 Random.seed!(1234)
+
+@testset "library info functions" begin
+    ZSTD_c_compressionLevel = Int32(100)
+    bounds = ZSTD_cParam_getBounds(ZSTD_c_compressionLevel)
+    @test !ZSTD_isError(bounds.error)
+    @test bounds.lowerBound == ZSTD_minCLevel()
+    @test bounds.upperBound == ZSTD_maxCLevel()
+    @test ZSTD_defaultCLevel() ∈ ZSTD_minCLevel():ZSTD_maxCLevel()
+    @test ZSTD_versionNumber().major == 1
+    ZSTD_d_windowLogMax = Int32(100)
+    bounds = ZSTD_dParam_getBounds(ZSTD_d_windowLogMax)
+    @test bounds isa ZSTD_bounds
+end
 @testset "encode_bound" begin
     local a = last(decoded_size_range(ZstdEncodeOptions()))
     @test encode_bound(ZstdEncodeOptions(), a) == typemax(Int64) - 1
@@ -38,13 +59,13 @@ end
     # advanced parameters
     # As an example turn off the content size flag
     # From zstd.h:
-    ZSTD_c_contentSizeFlag = Cint(200)
+    ZSTD_c_contentSizeFlag = Int32(200)
     # /* Content size will be written into frame header _whenever known_ (default:1)
     # * Content size must be known at the beginning of compression.
     # * This is automatically the case when using ZSTD_compress2(),
     # * For streaming scenarios, content size must be provided with ZSTD_CCtx_setPledgedSrcSize() */
     e = ZstdEncodeOptions(;advanced_parameters=[
-        ZSTD_c_contentSizeFlag=>Cint(0),
+        ZSTD_c_contentSizeFlag=>Int32(0),
     ])
     test_codec(ZstdCodec(), e, ZstdDecodeOptions(); trials=50)
 end

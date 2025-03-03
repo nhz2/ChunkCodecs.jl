@@ -7,10 +7,20 @@ using Test
 # Trigger HDF5 filter loading
 import CodecBzip2
 import Blosc
+import CodecZstd
 
+# Useful links:
+# https://support.hdfgroup.org/documentation/index.html
+# https://github.com/HDFGroup/hdf5_plugins/blob/master/docs/RegisteredFilterPlugins.md
+# https://github.com/HDFGroup/hdf5_plugins
 
-# List of encode options and filter ids and client datas
+# List of encode options and filter ids and client data
 codecs = [
+    [(
+        ChunkCodecLibZstd.ZstdEncodeOptions(;compressionLevel),
+        ([UInt16(32015)], [[compressionLevel%UInt32]]),
+        200,
+    ) for compressionLevel in -3:9];
     [(
         ChunkCodecLibBlosc.BloscEncodeOptions(;),
         ([UInt16(32001)], [[UInt32(2),UInt32(2)]]),
