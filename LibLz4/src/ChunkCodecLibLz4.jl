@@ -18,8 +18,7 @@ import ChunkCodecCore:
     encode_bound,
     is_thread_safe,
     try_find_decoded_size,
-    decoded_size_range,
-    decode_options
+    decoded_size_range
 
 export LZ4FrameCodec,
     LZ4FrameEncodeOptions,
@@ -27,15 +26,13 @@ export LZ4FrameCodec,
     LZ4BlockCodec,
     LZ4BlockEncodeOptions,
     LZ4BlockDecodeOptions,
-    LZ4ZarrCodec,
-    LZ4ZarrEncodeOptions,
-    LZ4ZarrDecodeOptions,
+    LZ4NumcodecsCodec,
+    LZ4NumcodecsEncodeOptions,
+    LZ4NumcodecsDecodeOptions,
     # LZ4HDF5Codec,
     # LZ4HDF5EncodeOptions,
     # LZ4HDF5DecodeOptions,
     LZ4DecodingError
-
-public LZ4F_MAX_CLEVEL
 
 # reexport ChunkCodecCore
 using ChunkCodecCore: ChunkCodecCore, encode, decode
@@ -79,18 +76,19 @@ This is the LZ4 Block format described in https://github.com/lz4/lz4/blob/v1.10.
 
 This format has no framing layer and is NOT compatible with the `lz4` CLI.
 
-[`LZ4BlockEncodeOptions`](@ref) and [`LZ4BlockDecodeOptions`](@ref)
-can be used to set decoding and encoding options.
+Decoding requires the exact encoded size to be known.
 
-Decoding requires the exact compressed size to be known.
+There is also a maximum decoded size of about 2 GB for this implementation.
+
+See also [`LZ4BlockEncodeOptions`](@ref) and [`LZ4BlockDecodeOptions`](@ref)
 """
 struct LZ4BlockCodec <: Codec
 end
 decode_options(::LZ4BlockCodec) = LZ4BlockDecodeOptions() # default decode options
 
 """
-    struct LZ4ZarrCodec <: Codec
-    LZ4ZarrCodec()
+    struct LZ4NumcodecsCodec <: Codec
+    LZ4NumcodecsCodec()
 
 lz4 numcodecs style compression using liblz4: https://lz4.org/
 
@@ -101,14 +99,15 @@ This format is documented in https://numcodecs.readthedocs.io/en/stable/compress
 
 This format is NOT compatible with the `lz4` CLI.
 
-[`LZ4ZarrEncodeOptions`](@ref) and [`LZ4ZarrDecodeOptions`](@ref)
-can be used to set decoding and encoding options.
-
 Decoding requires the exact encoded size to be known.
+
+There is also a maximum decoded size of about 2 GB for this implementation.
+
+See also [`LZ4NumcodecsEncodeOptions`](@ref) and [`LZ4NumcodecsDecodeOptions`](@ref)
 """
-struct LZ4ZarrCodec <: Codec
+struct LZ4NumcodecsCodec <: Codec
 end
-decode_options(::LZ4ZarrCodec) = LZ4ZarrDecodeOptions() # default decode options
+decode_options(::LZ4NumcodecsCodec) = LZ4NumcodecsDecodeOptions() # default decode options
 
 include("encode.jl")
 include("decode.jl")

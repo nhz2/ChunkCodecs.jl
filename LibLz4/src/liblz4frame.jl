@@ -4,9 +4,6 @@
 const LZ4F_VERSION = Cuint(100) # This number can be used to check for an incompatible API breaking change
 LZ4F_getVersion()::Cuint = ccall((:LZ4F_getVersion, liblz4), Cuint, ())
 
-"maximum allowed compression level"
-const LZ4F_MAX_CLEVEL::Cint = ccall((:LZ4F_compressionLevel_max, liblz4), Cint, ()) #  v1.8.0+
-
 """
     LZ4F_isError(ret::Csize_t)::Bool
 

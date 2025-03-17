@@ -309,8 +309,8 @@ function dry_run_block_decode(src::AbstractVector{UInt8})::Int64
 end
 
 """
-    struct LZ4ZarrDecodeOptions <: DecodeOptions
-    LZ4ZarrDecodeOptions(::LZ4ZarrCodec=LZ4ZarrCodec(); kwargs...)
+    struct LZ4NumcodecsDecodeOptions <: DecodeOptions
+    LZ4NumcodecsDecodeOptions(::LZ4NumcodecsCodec=LZ4NumcodecsCodec(); kwargs...)
 
 lz4 numcodecs style compression using liblz4: https://lz4.org/
 
@@ -318,22 +318,22 @@ This is the LZ4 Zarr format described in https://numcodecs.readthedocs.io/en/sta
 
 # Keyword Arguments
 
-- `codec::LZ4ZarrCodec=LZ4ZarrCodec()`
+- `codec::LZ4NumcodecsCodec=LZ4NumcodecsCodec()`
 """
-struct LZ4ZarrDecodeOptions <: DecodeOptions
-    codec::LZ4ZarrCodec
+struct LZ4NumcodecsDecodeOptions <: DecodeOptions
+    codec::LZ4NumcodecsCodec
 end
-function LZ4ZarrDecodeOptions(;
-        codec::LZ4ZarrCodec=LZ4ZarrCodec(),
+function LZ4NumcodecsDecodeOptions(;
+        codec::LZ4NumcodecsCodec=LZ4NumcodecsCodec(),
         kwargs...
     )
-    LZ4ZarrDecodeOptions(codec)
+    LZ4NumcodecsDecodeOptions(codec)
 end
 
-is_thread_safe(::LZ4ZarrDecodeOptions) = true
+is_thread_safe(::LZ4NumcodecsDecodeOptions) = true
 
 # There is a 4 byte header with the decoded size as a 32 bit unsigned integer
-function try_find_decoded_size(::LZ4ZarrDecodeOptions, src::AbstractVector{UInt8})::Int64
+function try_find_decoded_size(::LZ4NumcodecsDecodeOptions, src::AbstractVector{UInt8})::Int64
     if length(src) < 4
         throw(LZ4DecodingError("unexpected end of input"))
     else
@@ -349,7 +349,7 @@ function try_find_decoded_size(::LZ4ZarrDecodeOptions, src::AbstractVector{UInt8
     end
 end
 
-function try_decode!(d::LZ4ZarrDecodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
+function try_decode!(d::LZ4NumcodecsDecodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
     decoded_size = try_find_decoded_size(d, src)
     @assert !isnothing(decoded_size)
     dst_size::Int64 = length(dst)
