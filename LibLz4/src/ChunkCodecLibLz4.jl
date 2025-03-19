@@ -46,20 +46,18 @@ include("liblz4frame.jl")
     struct LZ4FrameCodec <: Codec
     LZ4FrameCodec()
 
-lz4 frame compression using liblz4: https://lz4.org/
+LZ4 frame compression using liblz4: https://lz4.org/
 
 This is the LZ4 Frame (.lz4) format described in https://github.com/lz4/lz4/blob/v1.10.0/doc/lz4_Frame_format.md
 
 This format is compatible with the `lz4` CLI.
-
-[`LZ4FrameEncodeOptions`](@ref) and [`LZ4FrameDecodeOptions`](@ref)
-can be used to set decoding and encoding options.
 
 Encode compresses data as a single frame.
 Decoding will succeed even if the decompressed size is unknown.
 Decoding accepts concatenated frames 
 and will error if there is invalid data appended.
 
+See also [`LZ4FrameEncodeOptions`](@ref) and [`LZ4FrameDecodeOptions`](@ref)
 """
 struct LZ4FrameCodec <: Codec
 end
@@ -76,7 +74,7 @@ This is the LZ4 Block format described in https://github.com/lz4/lz4/blob/v1.10.
 
 This format has no framing layer and is NOT compatible with the `lz4` CLI.
 
-Decoding requires the exact encoded size to be known.
+Decoding requires the encoded size to be at most `typemax(Int32)`.
 
 There is also a maximum decoded size of about 2 GB for this implementation.
 
@@ -99,7 +97,7 @@ This format is documented in https://numcodecs.readthedocs.io/en/stable/compress
 
 This format is NOT compatible with the `lz4` CLI.
 
-Decoding requires the exact encoded size to be known.
+Decoding requires the encoded size to be at most `typemax(Int32) + 4`.
 
 There is also a maximum decoded size of about 2 GB for this implementation.
 

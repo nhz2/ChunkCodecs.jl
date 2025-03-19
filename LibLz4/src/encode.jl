@@ -2,30 +2,37 @@
     struct LZ4FrameEncodeOptions <: EncodeOptions
     LZ4FrameEncodeOptions(; kwargs...)
 
+lz4 frame compression using liblz4: https://lz4.org/
+
 This is the LZ4 Frame (.lz4) format described in https://github.com/lz4/lz4/blob/v1.10.0/doc/lz4_Frame_format.md
+
+This format is compatible with the `lz4` CLI.
 
 # Keyword Arguments
 
 - `codec::LZ4FrameCodec=LZ4FrameCodec()`
 - `compressionLevel::Integer=0`: Compression level, 0: default (fast mode); values > $(LZ4_MAX_CLEVEL) count as $(LZ4_MAX_CLEVEL); values < 0 trigger fast acceleration.
 - `blockSizeID::Integer=0`: 0: default (max64KB), 4: max64KB, 5: max256KB, 6: max1MB, 7: max4MB;
-The larger the block size, the (slightly) better the compression ratio,
-though there are diminishing returns.
-Larger blocks also increase memory usage on both compression and decompression sides.
+
+  The larger the block size, the (slightly) better the compression ratio,
+  though there are diminishing returns.
+  Larger blocks also increase memory usage on both compression and decompression sides.
 - `blockMode::Bool=false`: false: blockLinked, true: blockIndependent;
-Linked blocks sharply reduce inefficiencies when using small blocks, they compress better.
-However, some LZ4 decoders are only compatible with independent blocks.
+
+  Linked blocks sharply reduce inefficiencies when using small blocks, they compress better.
+  However, some LZ4 decoders are only compatible with independent blocks.
 - `contentChecksumFlag::Bool=false`: A 32-bits checksum of content is written at end of frame.
 - `contentSize::Bool=false`: Save size of uncompressed content ; false == unknown.
-If the content size is zero, it will not be saved, even if this option is true due to a 
-limitation in liblz4. Ref: https://github.com/lz4/lz4/issues/775
+
+  If the content size is zero, it will not be saved, even if this option is true due to a
+  limitation in liblz4. Ref: https://github.com/lz4/lz4/issues/775
 - `blockChecksumFlag::Bool=false`: each block followed by a checksum of block's compressed data.
 - `favorDecSpeed::Bool=false`: if true, parser favors decompression speed vs compression ratio. Only works for high compressionLevel (>= LZ4HC_CLEVEL_OPT_MIN)
 """
 struct LZ4FrameEncodeOptions <: EncodeOptions
     codec::LZ4FrameCodec
-    compressionLevel::Cint
-    blockSizeID::Cint
+    compressionLevel::Int32
+    blockSizeID::Int32
     blockMode::Bool
     contentChecksumFlag::Bool
     contentSize::Bool
@@ -44,7 +51,7 @@ function LZ4FrameEncodeOptions(;
         kwargs...
     )
     blockSizeID ∈ (0, 4, 5, 6, 7) || throw(ArgumentError("blockSizeID: $(blockSizeID) must be in (0, 4, 5, 6, 7)"))
-    _clamped_compression_level = clamp(compressionLevel, -(LZ4_ACCELERATION_MAX - 1), LZ4F_MAX_CLEVEL)
+    _clamped_compression_level = clamp(compressionLevel, LZ4_MIN_CLEVEL, LZ4_MAX_CLEVEL)
     LZ4FrameEncodeOptions(codec, _clamped_compression_level, blockSizeID, blockMode, contentChecksumFlag, contentSize, blockChecksumFlag, favorDecSpeed)
 end
 
@@ -119,8 +126,6 @@ This is the LZ4 Block format described in https://github.com/lz4/lz4/blob/v1.10.
 
 This format has no framing layer and is NOT compatible with the `lz4` CLI.
 
-Decoding requires the exact compressed size to be known.
-
 There is also a maximum decoded size of about 2 GB for this implementation.
 
 # Keyword Arguments
@@ -149,7 +154,7 @@ function encode_bound(::LZ4BlockEncodeOptions, src_size::Int64)::Int64
     if src_size > LZ4_MAX_INPUT_SIZE
         typemax(Int64)
     else
-        lz4_compressbound(src_size)
+        unsafe_lz4_compressbound(src_size)
     end
 end
 
@@ -169,7 +174,7 @@ function try_encode!(e::LZ4BlockEncodeOptions, dst::AbstractVector{UInt8}, src::
     ret = GC.@preserve cconv_src cconv_dst begin
         src_p = Base.unsafe_convert(Ptr{UInt8}, cconv_src)
         dst_p = Base.unsafe_convert(Ptr{UInt8}, cconv_dst)
-        lz4_compress(src_p, dst_p, src_size32, clamp(dst_size, Int32), e.compressionLevel)
+        unsafe_lz4_compress(src_p, dst_p, src_size32, clamp(dst_size, Int32), e.compressionLevel)
     end
     if iszero(ret)
         nothing
@@ -190,8 +195,6 @@ size of the decoded data as a little-endian 32-bit signed integer.
 This format is documented in https://numcodecs.readthedocs.io/en/stable/compression/lz4.html
 
 This format is NOT compatible with the `lz4` CLI.
-
-Decoding requires the exact encoded size to be known.
 
 There is also a maximum decoded size of about 2 GB for this implementation.
 
@@ -215,13 +218,13 @@ end
 
 is_thread_safe(::LZ4NumcodecsEncodeOptions) = true
 
-decoded_size_range(e::LZ4NumcodecsEncodeOptions) = Int64(0):Int64(1):LZ4_MAX_INPUT_SIZE
+decoded_size_range(::LZ4NumcodecsEncodeOptions) = Int64(0):Int64(1):LZ4_MAX_INPUT_SIZE
 
-function encode_bound(e::LZ4NumcodecsEncodeOptions, src_size::Int64)::Int64
+function encode_bound(::LZ4NumcodecsEncodeOptions, src_size::Int64)::Int64
     if src_size > LZ4_MAX_INPUT_SIZE
         typemax(Int64)
     else
-        lz4_compressbound(src_size) + Int64(4)
+        unsafe_lz4_compressbound(src_size) + Int64(4)
     end
 end
 
@@ -242,15 +245,15 @@ function try_encode!(e::LZ4NumcodecsEncodeOptions, dst::AbstractVector{UInt8}, s
         src_p = Base.unsafe_convert(Ptr{UInt8}, cconv_src)
         dst_p = Base.unsafe_convert(Ptr{UInt8}, cconv_dst)
         for i in 0:3
-            unsafe_store!(dst_p+i, src_size32>>>(i*8) & 0xFF)
+            unsafe_store!(dst_p+i, (src_size32>>>(i*8))%UInt8)
         end
         dst_size -= 4
         dst_p += 4
-        lz4_compress(src_p, dst_p, src_size32, clamp(dst_size, Int32), e.compressionLevel)
+        unsafe_lz4_compress(src_p, dst_p, src_size32, clamp(dst_size, Int32), e.compressionLevel)
     end
     if iszero(ret)
         nothing
     else
-        Int64(ret)
+        Int64(ret) + Int64(4)
     end
 end

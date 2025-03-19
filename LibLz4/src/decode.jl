@@ -19,6 +19,14 @@ end
 
 lz4 frame decompression using liblz4: https://lz4.org/
 
+This is the LZ4 Frame (.lz4) format described in https://github.com/lz4/lz4/blob/v1.10.0/doc/lz4_Frame_format.md
+
+This format is compatible with the `lz4` CLI.
+
+Decoding will succeed even if the decompressed size is unknown.
+Decoding accepts concatenated frames 
+and will error if there is invalid data appended.
+
 # Keyword Arguments
 
 - `codec::LZ4FrameCodec=LZ4FrameCodec()`
@@ -55,7 +63,7 @@ function try_resize_decode!(d::LZ4FrameDecodeOptions, dst::AbstractVector{UInt8}
     check_contiguous(dst)
     check_contiguous(src)
     cconv_src = Base.cconvert(Ptr{UInt8}, src)
-    # This outer loop is to decode a concatenation of multiple compressed streams.
+    # This outer loop is to decode a concatenation of multiple compressed frames.
     while true
         dctx = LZ4F_createDecompressionContext()
         try
@@ -143,7 +151,13 @@ end
     struct LZ4BlockDecodeOptions <: DecodeOptions
     LZ4BlockDecodeOptions(::LZ4BlockCodec=LZ4BlockCodec(); kwargs...)
 
-lz4 block decompression using liblz4: https://lz4.org/
+lz4 block compression using liblz4: https://lz4.org/
+
+This is the LZ4 Block format described in https://github.com/lz4/lz4/blob/v1.10.0/doc/lz4_Block_format.md
+
+This format has no framing layer and is NOT compatible with the `lz4` CLI.
+
+Decoding requires the encoded size to be at most `typemax(Int32)`.
 
 # Keyword Arguments
 
@@ -158,6 +172,7 @@ function LZ4BlockDecodeOptions(;
     )
     LZ4BlockDecodeOptions(codec)
 end
+
 is_thread_safe(::LZ4BlockDecodeOptions) = true
 
 # There is no header or footer, so always return nothing
@@ -169,24 +184,28 @@ function try_decode!(d::LZ4BlockDecodeOptions, dst::AbstractVector{UInt8}, src::
     check_contiguous(dst)
     check_contiguous(src)
     src_size::Int64 = length(src)
-    check_in_range(Cint(0):typemax(Cint); src_size)
-    # LZ4_decompress_safe (const char* src, char* dst, int compressedSize, int dstCapacity);
-    dstCapacity = clamp(length(dst), Cint)
-    ret = ccall(
-        (:LZ4_decompress_safe, liblz4), Cint,
-        (Ptr{UInt8}, Ptr{UInt8}, Cint, Cint),
-        src, dst, src_size, dstCapacity
-    )
+    if src_size > typemax(Int32)
+        throw(LZ4DecodingError("encoded size is larger than `typemax(Int32)`"))
+    end
+    src_size32 = src_size%Int32
+    dst_size32 = clamp(length(dst), Int32)
+    cconv_src = Base.cconvert(Ptr{UInt8}, src)
+    cconv_dst = Base.cconvert(Ptr{UInt8}, dst)
+    ret = GC.@preserve cconv_src cconv_dst begin
+        src_p = Base.unsafe_convert(Ptr{UInt8}, cconv_src)
+        dst_p = Base.unsafe_convert(Ptr{UInt8}, cconv_dst)
+        unsafe_lz4_decompress(src_p, dst_p, src_size32, dst_size32)
+    end
     if signbit(ret)
         # Manually find the decoded size because
         # Otherwise there is no way to tell if malformed or dst is
         # too small :(.
         # This is not done in try_find_decoded_size because it is too slow
         actual_decoded_len = dry_run_block_decode(src)
-        if actual_decoded_len ≤ dstCapacity
+        if actual_decoded_len ≤ dst_size32
             throw(LZ4DecodingError("unknown LZ4 block decoding error"))
-        elseif actual_decoded_len > typemax(Cint)
-            throw(LZ4DecodingError("actual decoded length > typemax(Cint): $(actual_decoded_len) > $(typemax(Cint))"))
+        elseif actual_decoded_len > typemax(Int32)
+            throw(LZ4DecodingError("actual decoded size > typemax(Int32): $(actual_decoded_len) > $(typemax(Int32))"))
         else
             # Ok to try again with larger dst
            return nothing
@@ -314,7 +333,14 @@ end
 
 lz4 numcodecs style compression using liblz4: https://lz4.org/
 
-This is the LZ4 Zarr format described in https://numcodecs.readthedocs.io/en/stable/compression/lz4.html
+This is the [`LZ4BlockCodec`](@ref) format with a 4-byte header containing the
+size of the decoded data as a little-endian 32-bit signed integer.
+
+This format is documented in https://numcodecs.readthedocs.io/en/stable/compression/lz4.html
+
+This format is NOT compatible with the `lz4` CLI.
+
+Decoding requires the exact encoded size to be known and be no more than `typemax(Int32) + 4`.
 
 # Keyword Arguments
 
@@ -350,16 +376,33 @@ function try_find_decoded_size(::LZ4NumcodecsDecodeOptions, src::AbstractVector{
 end
 
 function try_decode!(d::LZ4NumcodecsDecodeOptions, dst::AbstractVector{UInt8}, src::AbstractVector{UInt8}; kwargs...)::Union{Nothing, Int64}
+    check_contiguous(dst)
+    check_contiguous(src)
     decoded_size = try_find_decoded_size(d, src)
     @assert !isnothing(decoded_size)
+    src_size::Int64 = length(src)
+    if src_size-4 > typemax(Int32)
+        throw(LZ4DecodingError("encoded size is larger than `typemax(Int32) + 4`"))
+    end
+    src_size32 = (src_size-4)%Int32
     dst_size::Int64 = length(dst)
     if decoded_size > dst_size
         nothing
     else
-        ret = try_decode!(LZ4BlockDecodeOptions(), dst, @view(src[begin+4:end]))
-        if ret != decoded_size
-            throw(LZ4DecodingError("saved decoded size is not correct"))
+        cconv_src = Base.cconvert(Ptr{UInt8}, src)
+        cconv_dst = Base.cconvert(Ptr{UInt8}, dst)
+        GC.@preserve cconv_src cconv_dst begin
+            src_p = Base.unsafe_convert(Ptr{UInt8}, cconv_src)
+            dst_p = Base.unsafe_convert(Ptr{UInt8}, cconv_dst)
+            # decoded_size must already be ≤ typemax(Int32) from try_find_decoded_size
+            ret = unsafe_lz4_decompress(src_p+4, dst_p, src_size32, decoded_size%Int32)
+            if signbit(ret)
+                throw(LZ4DecodingError("src is malformed"))
+            elseif ret != decoded_size
+                throw(LZ4DecodingError("saved decoded size is not correct"))
+            else
+                return Int64(ret)
+            end
         end
-        ret
     end
 end

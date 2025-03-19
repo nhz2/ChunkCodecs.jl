@@ -12,8 +12,8 @@ end
 @testset "block" begin
     include("block.jl")
 end
-@testset "zarr" begin
-    include("zarr.jl")
+@testset "numcodecs" begin
+    include("numcodecs.jl")
 end
 @testset "errors" begin
     @test sprint(Base.showerror, LZ4DecodingError("test message")) ==

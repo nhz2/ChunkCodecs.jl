@@ -16,13 +16,13 @@ const LZ4_MIN_CLEVEL::Int32 = -(LZ4_ACCELERATION_MAX - Int32(1))
 const LZ4_MAX_CLEVEL::Int32 = LZ4HC_CLEVEL_MAX
 
 # LZ4_COMPRESSBOUND assuming `src_size` is in 0:LZ4_MAX_INPUT_SIZE
-function lz4_compressbound(src_size::Int64)
+function unsafe_lz4_compressbound(src_size::Int64)
     src_size + src_size÷Int64(255) + Int64(16)
 end
 
 # Combination of LZ4_compress_fast and LZ4_compress_HC
 # Returns the number of bytes written to `dst` or 0 if compression fails.
-function lz4_compress(src::Ptr{UInt8}, dst::Ptr{UInt8}, src_size::Int32, dst_size::Int32, level::Int32)::Int32
+function unsafe_lz4_compress(src::Ptr{UInt8}, dst::Ptr{UInt8}, src_size::Int32, dst_size::Int32, level::Int32)::Int32
     if level < LZ4HC_CLEVEL_MIN
         # Fast mode 
         # Convert level to acceleration using
@@ -48,6 +48,15 @@ function lz4_compress(src::Ptr{UInt8}, dst::Ptr{UInt8}, src_size::Int32, dst_siz
             src, dst, src_size, dst_size, level
         )
     end
+end
+
+# Returns the number of bytes written to `dst` or a negative if decompression fails.
+function unsafe_lz4_decompress(src::Ptr{UInt8}, dst::Ptr{UInt8}, src_size::Int32, dst_size::Int32)::Int32
+    ccall(
+        (:LZ4_decompress_safe, liblz4), Cint,
+        (Ptr{UInt8}, Ptr{UInt8}, Cint, Cint),
+        src, dst, src_size, dst_size
+    )
 end
 
 # The following is the original license info from lz4.h and lz4hc.h

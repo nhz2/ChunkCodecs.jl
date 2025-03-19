@@ -97,7 +97,7 @@ struct LZ4F_preferences_t
     frameInfo::LZ4F_frameInfo_t
 
     "0: default (fast mode); values > LZ4HC_CLEVEL_MAX count as LZ4HC_CLEVEL_MAX; values < 0 trigger fast acceleration"
-    compressionLevel::Cint # int const acceleration = (level < 0) ? -level + 1 : 1;
+    compressionLevel::Cint
 
     "1: always flush; reduces usage of internal buffers"
     autoFlush::Cuint

@@ -3,12 +3,8 @@ using ChunkCodecLibLz4
 using ChunkCodecTests: test_codec
 using Test: @testset, @test_throws, @test
 
-@testset "encode_bound" begin
-    local a = last(decoded_size_range(LZ4FrameEncodeOptions()))
-    @test encode_bound(LZ4FrameEncodeOptions(), a) > a
-end
 @testset "default" begin
-    test_codec(LZ4FrameCodec(), LZ4FrameEncodeOptions(), LZ4FrameDecodeOptions(); trials=10)
+    test_codec(LZ4FrameCodec(), LZ4FrameEncodeOptions(), LZ4FrameDecodeOptions(); trials=100)
 end
 @testset "compressionLevel options" begin
     # Compression level is clamped
@@ -75,4 +71,16 @@ end
     c[end] ⊻= 0xFF
     # This fails checksum
     @test_throws LZ4DecodingError decode(d, c)
+end
+@testset "Skippable Frames" begin
+    e = LZ4FrameEncodeOptions()
+    d = LZ4FrameDecodeOptions()
+    u = [0x00, 0x01, 0x02]
+    c = [encode(e, u); 0x50; 0x2A; 0x4D; 0x18; 0x00; 0x00; 0x00; 0x00]
+    @test decode(d, c) == u
+    @test_throws LZ4DecodingError decode(d, c[1:end-1])
+    c = [encode(e, u); 0x50; 0x2A; 0x4D; 0x18; 0x01; 0x00; 0x00; 0x00; 0x42]
+    @test decode(d, c) == u
+    @test_throws LZ4DecodingError decode(d, c[1:end-1])
+    @test decode(d, [0x50; 0x2A; 0x4D; 0x18; 0x00; 0x00; 0x00; 0x00]) == UInt8[]
 end

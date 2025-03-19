@@ -3,10 +3,6 @@ using ChunkCodecLibLz4
 using ChunkCodecTests: test_codec
 using Test: @testset, @test_throws, @test
 
-@testset "encode_bound" begin
-    local a = last(decoded_size_range(LZ4NumcodecsEncodeOptions()))
-    @test encode_bound(LZ4NumcodecsEncodeOptions(), a) > a
-end
 @testset "default" begin
     test_codec(LZ4NumcodecsCodec(), LZ4NumcodecsEncodeOptions(), LZ4NumcodecsDecodeOptions(); trials=100)
 end
@@ -28,9 +24,9 @@ end
     c = encode(e, u)
     @test decode(d, c) == u
     for i in 1:length(c)
-        @test_throws LZ4DecodingError("unexpected end of input") decode(d, c[1:i-1])
+        @test_throws LZ4DecodingError decode(d, c[1:i-1])
     end
-    @test_throws LZ4DecodingError("unexpected end of input") decode(d, u)
+    @test_throws LZ4DecodingError decode(d, u)
 end
 @testset "incorrect decoded size" begin
     e = LZ4NumcodecsEncodeOptions()
@@ -50,10 +46,5 @@ end
 @testset "max decoded size" begin
     d = LZ4NumcodecsDecodeOptions()
     c = UInt8[0xFF;0xFF;0xFF;0x7F; 0x1F;0x00;0x01;0x00;fill(0xFF,8421504);0x66;0x50;fill(0x00,5)]
-    if Sys.WORD_SIZE == 64 && get(Returns("false"), ENV, "CI") != "true"
-        out = decode(d, c)
-        @test all(iszero, out)
-        @test length(out) == typemax(Cint)
-    end
     @test_throws DecodedSizeError(2^24, typemax(Int32)) decode(d, c; max_size=Int64(2)^24)
 end

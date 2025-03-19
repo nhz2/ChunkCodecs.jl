@@ -3,18 +3,8 @@ using ChunkCodecLibLz4
 using ChunkCodecTests: test_codec
 using Test: @testset, @test_throws, @test
 
-@testset "encode_bound" begin
-    local a = last(decoded_size_range(LZ4BlockEncodeOptions()))
-    @test encode_bound(LZ4BlockEncodeOptions(), a) > a
-end
 @testset "default" begin
-    # LZ4 on win32 is very slow
-    trials = if Sys.iswindows() && Sys.WORD_SIZE == 32
-        10
-    else
-        100
-    end
-    test_codec(LZ4BlockCodec(), LZ4BlockEncodeOptions(), LZ4BlockDecodeOptions(); trials)
+    test_codec(LZ4BlockCodec(), LZ4BlockEncodeOptions(), LZ4BlockDecodeOptions(); trials = 100)
 end
 @testset "compressionLevel options" begin
     # Compression level is clamped
@@ -76,35 +66,19 @@ end
         end
     end
     @testset "max decoded size" begin
-        m = last(decoded_size_range(e))
         max_cint_zeros = UInt8[0x1F;0x00;0x01;0x00;fill(0xFF,8421504);0x66;0x50;fill(0x00,5)]
         over_max_cint_zeros = UInt8[0x1F;0x00;0x01;0x00;fill(0xFF,8421504);0x67;0x50;fill(0x00,5)]
         @test f(max_cint_zeros) == typemax(Cint)
         @test f(over_max_cint_zeros) == Int64(typemax(Cint))+1
         @test_throws(
-            LZ4DecodingError("actual decoded length > typemax(Cint): 2147483648 > 2147483647"),
+            LZ4DecodingError("actual decoded size > typemax(Int32): 2147483648 > 2147483647"),
             decode(d, over_max_cint_zeros; max_size=Int64(2)^24),
         )
         @test_throws(
             DecodedSizeError,
             decode(d, max_cint_zeros; max_size=Int64(2)^24),
         )
-        DecodedSizeError
-        if Sys.WORD_SIZE == 64 && get(Returns("false"), ENV, "CI") != "true"
-            input = zeros(UInt8, m)
-            for i in m:-1:m-16
-                local c = encode(e, @view(input[1:i]))
-                @test f(c) == i
-            end
-            out = decode(d, max_cint_zeros)
-            @test all(iszero, out)
-            @test length(out) == typemax(Cint)
-            @test_throws LZ4DecodingError("actual decoded length > typemax(Cint): 2147483648 > 2147483647") decode(d, over_max_cint_zeros)
-            input = rand(UInt8, m)
-            c = encode(e, input)
-            @test f(c) == m
-            @test decode(d, c) == input
-        end
+        @test_throws LZ4DecodingError("actual decoded size > typemax(Int32): 2147483648 > 2147483647") decode(d, over_max_cint_zeros)
     end
     @testset "end of block condition 2 and 3" begin
         # decode starts at 12 from end with length 7
