@@ -4,9 +4,6 @@
 const LZ4F_VERSION = Cuint(100) # This number can be used to check for an incompatible API breaking change
 LZ4F_getVersion()::Cuint = ccall((:LZ4F_getVersion, liblz4), Cuint, ())
 
-"maximum allowed compression level"
-const LZ4F_MAX_CLEVEL::Cint = ccall((:LZ4F_compressionLevel_max, liblz4), Cint, ()) #  v1.8.0+
-
 """
     LZ4F_isError(ret::Csize_t)::Bool
 
@@ -100,7 +97,7 @@ struct LZ4F_preferences_t
     frameInfo::LZ4F_frameInfo_t
 
     "0: default (fast mode); values > LZ4HC_CLEVEL_MAX count as LZ4HC_CLEVEL_MAX; values < 0 trigger fast acceleration"
-    compressionLevel::Cint # int const acceleration = (level < 0) ? -level + 1 : 1;
+    compressionLevel::Cint
 
     "1: always flush; reduces usage of internal buffers"
     autoFlush::Cuint

@@ -7,7 +7,7 @@ codecs = [
     (ChunkCodecLibBlosc.BloscEncodeOptions(),   ("blosc",   (;)), 1000),
     (ChunkCodecLibBzip2.BZ2EncodeOptions(),     ("bz2",     (;)), 50),
     (ChunkCodecLibLz4.LZ4BlockEncodeOptions(),  ("lz4",     (;header=false)), 1000),
-    (ChunkCodecLibLz4.LZ4ZarrEncodeOptions(),   ("lz4",     (;header=true)), 1000),
+    (ChunkCodecLibLz4.LZ4NumcodecsEncodeOptions(),   ("lz4",     (;header=true)), 1000),
     (ChunkCodecLibLz4.LZ4FrameEncodeOptions(),  ("lz4f",    (;)), 1000),
     (ChunkCodecLibZlib.ZlibEncodeOptions(),     ("zlib",    (;)), 100),
     (ChunkCodecLibZlib.DeflateEncodeOptions(),  ("deflate", (;raw=true)), 100),
