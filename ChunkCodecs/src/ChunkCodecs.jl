@@ -8,6 +8,7 @@ codec_packages = [
     :ChunkCodecLibBlosc,
     :ChunkCodecLibBzip2,
     :ChunkCodecLibLz4,
+    :ChunkCodecLibSnappy,
     :ChunkCodecLibZlib,
     :ChunkCodecLibZstd,
 ]
