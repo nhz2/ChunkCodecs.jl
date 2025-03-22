@@ -49,6 +49,11 @@ jobs:
             - ChunkCodecCore/**
             - ChunkCodecTests/**
             - LibLz4/**
+          LibSnappy:
+            - .github/**
+            - ChunkCodecCore/**
+            - ChunkCodecTests/**
+            - LibSnappy/**
           LibZlib:
             - .github/**
             - ChunkCodecCore/**
