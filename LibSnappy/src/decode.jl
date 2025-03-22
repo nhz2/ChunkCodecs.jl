@@ -56,6 +56,7 @@ function try_decode!(d::SnappyDecodeOptions, dst::AbstractVector{UInt8}, src::Ab
     src_size::Int64 = length(src)
     # TODO This restriction is not documented in the C API,
     # But there seem to be some overflow issues if the src_size is too large.
+    # Ref: https://github.com/google/snappy/issues/201
     if src_size > typemax(Int32)
         throw(SnappyDecodingError(SNAPPY_INVALID_INPUT))
     end

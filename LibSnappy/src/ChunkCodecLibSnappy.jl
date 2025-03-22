@@ -34,7 +34,9 @@ include("libsnappy.jl")
 
 Snappy compression using the snappy C++ library: https://github.com/google/snappy
 
-There is a maximum decoded size of about 1.8 GB.
+There is currently a maximum decoded size of about 1.8 GB.
+
+This may change if https://github.com/google/snappy/issues/201 is resolved.
 
 See also [`SnappyEncodeOptions`](@ref) and [`SnappyDecodeOptions`](@ref)
 """
