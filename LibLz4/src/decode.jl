@@ -149,7 +149,7 @@ end
 
 """
     struct LZ4BlockDecodeOptions <: DecodeOptions
-    LZ4BlockDecodeOptions(::LZ4BlockCodec=LZ4BlockCodec(); kwargs...)
+    LZ4BlockDecodeOptions(; kwargs...)
 
 lz4 block compression using liblz4: https://lz4.org/
 
@@ -329,7 +329,7 @@ end
 
 """
     struct LZ4NumcodecsDecodeOptions <: DecodeOptions
-    LZ4NumcodecsDecodeOptions(::LZ4NumcodecsCodec=LZ4NumcodecsCodec(); kwargs...)
+    LZ4NumcodecsDecodeOptions(; kwargs...)
 
 lz4 numcodecs style compression using liblz4: https://lz4.org/
 
@@ -358,7 +358,6 @@ end
 
 is_thread_safe(::LZ4NumcodecsDecodeOptions) = true
 
-# There is a 4 byte header with the decoded size as a 32 bit unsigned integer
 function try_find_decoded_size(::LZ4NumcodecsDecodeOptions, src::AbstractVector{UInt8})::Int64
     if length(src) < 4
         throw(LZ4DecodingError("unexpected end of input"))
