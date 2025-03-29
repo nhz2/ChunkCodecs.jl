@@ -4,7 +4,7 @@
 
 Snappy compression using the snappy C++ library: https://github.com/google/snappy
 
-There is currently a maximum decoded size of about 4 GB.
+The maximum decoded size is about 4 GB.
 
 # Keyword Arguments
 
