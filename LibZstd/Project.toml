@@ -5,9 +5,11 @@ version = "0.1.1"
 
 [deps]
 ChunkCodecCore = "0b6fb165-00bc-4d37-ab8b-79f91016dbe1"
+Compat = "34da2185-b29b-5c13-b0c7-acf172513d20"
 Zstd_jll = "3161d3a3-bdf6-5164-811a-617609db77b4"
 
 [compat]
 ChunkCodecCore = "0.4"
+Compat = "4.16.0"
 Zstd_jll = "1.5.6"
-julia = "1.11"
+julia = "1.10"

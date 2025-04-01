@@ -1,5 +1,6 @@
 module ChunkCodecLibZstd
 
+using Compat: @compat
 using Zstd_jll: libzstd
 
 using ChunkCodecCore:
@@ -25,7 +26,7 @@ export ZstdCodec,
     ZstdDecodeOptions,
     ZstdDecodingError
 
-public ZSTD_minCLevel,
+@compat public ZSTD_minCLevel,
     ZSTD_maxCLevel,
     ZSTD_defaultCLevel,
     ZSTD_versionNumber,

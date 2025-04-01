@@ -75,6 +75,7 @@ jobs:
         # e.g. ['package1', 'package2'] if both package folders contains changes
         package: ${{ fromJSON(needs.changes.outputs.packages) }}
         version:
+          - '1.10'
           - '1'
         os:
           - ubuntu-latest

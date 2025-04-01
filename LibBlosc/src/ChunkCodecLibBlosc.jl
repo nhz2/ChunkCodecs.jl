@@ -1,5 +1,6 @@
 module ChunkCodecLibBlosc
 
+using Compat: @compat
 using Blosc_jll: libblosc
 
 using ChunkCodecCore:
@@ -22,7 +23,7 @@ export BloscCodec,
     BloscDecodeOptions,
     BloscDecodingError
 
-public is_compressor_valid, compcode, compname
+@compat public is_compressor_valid, compcode, compname
 
 # reexport ChunkCodecCore
 using ChunkCodecCore: ChunkCodecCore, encode, decode

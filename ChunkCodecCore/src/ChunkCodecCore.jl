@@ -1,37 +1,39 @@
 module ChunkCodecCore
 
+using Compat: @compat
+
 export decode, encode
 
-public Codec
-public EncodeOptions
-public DecodeOptions
+@compat public Codec
+@compat public EncodeOptions
+@compat public DecodeOptions
 
-public DecodingError
-public DecodedSizeError
+@compat public DecodingError
+@compat public DecodedSizeError
 
-public decode_options
+@compat public decode_options
 
-public decoded_size_range
-public encode_bound
-public try_encode!
+@compat public decoded_size_range
+@compat public encode_bound
+@compat public try_encode!
 
-public try_find_decoded_size
-public try_decode!
+@compat public try_find_decoded_size
+@compat public try_decode!
 
-public check_in_range
-public check_contiguous
+@compat public check_in_range
+@compat public check_contiguous
 
-public can_concatenate
-public is_thread_safe
-public try_resize_decode!
+@compat public can_concatenate
+@compat public is_thread_safe
+@compat public try_resize_decode!
 
-public NoopCodec
-public NoopEncodeOptions
-public NoopDecodeOptions
+@compat public NoopCodec
+@compat public NoopEncodeOptions
+@compat public NoopDecodeOptions
 
-public ShuffleCodec
-public ShuffleEncodeOptions
-public ShuffleDecodeOptions
+@compat public ShuffleCodec
+@compat public ShuffleEncodeOptions
+@compat public ShuffleDecodeOptions
 
 include("types.jl")
 include("errors.jl")

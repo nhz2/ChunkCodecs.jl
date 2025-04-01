@@ -6,8 +6,9 @@ version = "0.1.1"
 [deps]
 Blosc_jll = "0b7ba130-8d10-5ba8-a3d6-c5182647fed9"
 ChunkCodecCore = "0b6fb165-00bc-4d37-ab8b-79f91016dbe1"
+Compat = "34da2185-b29b-5c13-b0c7-acf172513d20"
 
 [compat]
 Blosc_jll = "1"
 ChunkCodecCore = "0.4"
-julia = "1.11"
+julia = "1.10"
