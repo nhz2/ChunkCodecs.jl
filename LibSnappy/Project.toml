@@ -10,4 +10,4 @@ snappy_jll = "fe1e1685-f7be-5f59-ac9f-4ca204017dfd"
 [compat]
 ChunkCodecCore = "0.4"
 snappy_jll = "1"
-julia = "1.11"
+julia = "1.10"

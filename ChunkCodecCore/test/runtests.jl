@@ -88,3 +88,41 @@ end
     @test_throws DecodedSizeError(Int64(-1), nothing) decode(d, ones(UInt8, Int64(100)); max_size=Int64(-1))
     @test_throws DecodedSizeError(typemin(Int64), nothing) decode(d, ones(UInt8, Int64(100)); max_size=typemin(Int128))
 end
+@testset "public" begin
+    @static if VERSION ≥ v"1.11"
+        for sym in (
+            :Codec,
+            :EncodeOptions,
+            :DecodeOptions,
+
+            :DecodingError,
+            :DecodedSizeError,
+
+            :decode_options,
+
+            :decoded_size_range,
+            :encode_bound,
+            :try_encode!,
+
+            :try_find_decoded_size,
+            :try_decode!,
+
+            :check_in_range,
+            :check_contiguous,
+
+            :can_concatenate,
+            :is_thread_safe,
+            :try_resize_decode!,
+
+            :NoopCodec,
+            :NoopEncodeOptions,
+            :NoopDecodeOptions,
+
+            :ShuffleCodec,
+            :ShuffleEncodeOptions,
+            :ShuffleDecodeOptions
+        )
+            @test Base.ispublic(ChunkCodecCore, sym)
+        end
+    end
+end

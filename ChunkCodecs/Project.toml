@@ -20,7 +20,7 @@ ChunkCodecLibLz4 = "0.1"
 ChunkCodecLibSnappy = "0.1"
 ChunkCodecLibZlib = "0.1"
 ChunkCodecLibZstd = "0.1"
-julia = "1.11"
+julia = "1.10"
 
 [sources]
 ChunkCodecCore = {path = "../ChunkCodecCore"}

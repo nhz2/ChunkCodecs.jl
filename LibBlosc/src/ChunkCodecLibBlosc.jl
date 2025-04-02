@@ -8,7 +8,8 @@ using ChunkCodecCore:
     DecodeOptions,
     check_in_range,
     check_contiguous,
-    DecodingError
+    DecodingError,
+    @public
 import ChunkCodecCore:
     decode_options,
     try_decode!,
@@ -22,7 +23,7 @@ export BloscCodec,
     BloscDecodeOptions,
     BloscDecodingError
 
-public is_compressor_valid, compcode, compname
+@public is_compressor_valid, compcode, compname
 
 # reexport ChunkCodecCore
 using ChunkCodecCore: ChunkCodecCore, encode, decode

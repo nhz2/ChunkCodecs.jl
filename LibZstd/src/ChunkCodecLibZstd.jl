@@ -8,7 +8,8 @@ using ChunkCodecCore:
     DecodeOptions,
     check_contiguous,
     check_in_range,
-    DecodingError
+    DecodingError,
+    @public
 
 import ChunkCodecCore:
     can_concatenate,
@@ -25,7 +26,7 @@ export ZstdCodec,
     ZstdDecodeOptions,
     ZstdDecodingError
 
-public ZSTD_minCLevel,
+@public ZSTD_minCLevel,
     ZSTD_maxCLevel,
     ZSTD_defaultCLevel,
     ZSTD_versionNumber,
