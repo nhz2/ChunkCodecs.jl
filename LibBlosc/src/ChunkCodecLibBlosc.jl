@@ -9,7 +9,6 @@ using ChunkCodecCore:
     check_in_range,
     check_contiguous,
     DecodingError,
-    @public
 import ChunkCodecCore:
     decode_options,
     try_decode!,
@@ -23,7 +22,9 @@ export BloscCodec,
     BloscDecodeOptions,
     BloscDecodingError
 
-@public is_compressor_valid, compcode, compname
+@static if VERSION >= v"1.11.0-DEV.469"
+    eval(Meta.parse("public is_compressor_valid, compcode, compname"))
+end
 
 # reexport ChunkCodecCore
 using ChunkCodecCore: ChunkCodecCore, encode, decode

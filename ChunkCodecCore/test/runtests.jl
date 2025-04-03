@@ -43,7 +43,9 @@ end
 @testset "check helpers" begin
     @test_throws Exception ChunkCodecCore.check_contiguous(@view(zeros(UInt8, 8)[1:2:end]))
     @test_throws Exception ChunkCodecCore.check_contiguous(0x00:0xFF)
-    @test isnothing(ChunkCodecCore.check_contiguous(Memory{UInt8}(undef, 3)))
+    if VERSION ≥ v"1.11"
+        @test isnothing(ChunkCodecCore.check_contiguous(Memory{UInt8}(undef, 3)))
+    end
     @test isnothing(ChunkCodecCore.check_contiguous(Vector{UInt8}(undef, 3)))
     @test isnothing(ChunkCodecCore.check_contiguous(@view(zeros(UInt8, 8)[1:1:end])))
     @test_throws ArgumentError ChunkCodecCore.check_in_range(1:6; x=0)
@@ -89,7 +91,7 @@ end
     @test_throws DecodedSizeError(typemin(Int64), nothing) decode(d, ones(UInt8, Int64(100)); max_size=typemin(Int128))
 end
 @testset "public" begin
-    @static if VERSION ≥ v"1.11"
+    @static if VERSION >= v"1.11.0-DEV.469"
         for sym in (
             :Codec,
             :EncodeOptions,

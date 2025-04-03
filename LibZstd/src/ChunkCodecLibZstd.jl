@@ -9,7 +9,6 @@ using ChunkCodecCore:
     check_contiguous,
     check_in_range,
     DecodingError,
-    @public
 
 import ChunkCodecCore:
     can_concatenate,
@@ -26,14 +25,20 @@ export ZstdCodec,
     ZstdDecodeOptions,
     ZstdDecodingError
 
-@public ZSTD_minCLevel,
-    ZSTD_maxCLevel,
-    ZSTD_defaultCLevel,
-    ZSTD_versionNumber,
-    ZSTD_isError,
-    ZSTD_bounds,
-    ZSTD_cParam_getBounds,
-    ZSTD_dParam_getBounds
+
+@static if VERSION >= v"1.11.0-DEV.469"
+    eval(Meta.parse("""
+        public
+            ZSTD_minCLevel,
+            ZSTD_maxCLevel,
+            ZSTD_defaultCLevel,
+            ZSTD_versionNumber,
+            ZSTD_isError,
+            ZSTD_bounds,
+            ZSTD_cParam_getBounds,
+            ZSTD_dParam_getBounds
+    """))
+end
 
 # reexport ChunkCodecCore
 using ChunkCodecCore: ChunkCodecCore, encode, decode
