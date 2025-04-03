@@ -91,7 +91,7 @@ end
     @test_throws DecodedSizeError(typemin(Int64), nothing) decode(d, ones(UInt8, Int64(100)); max_size=typemin(Int128))
 end
 @testset "public" begin
-    @static if VERSION >= v"1.11.0-DEV.469"
+    if VERSION >= v"1.11.0-DEV.469"
         for sym in (
             :Codec,
             :EncodeOptions,

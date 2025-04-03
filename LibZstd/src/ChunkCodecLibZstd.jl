@@ -26,7 +26,7 @@ export ZstdCodec,
     ZstdDecodingError
 
 
-@static if VERSION >= v"1.11.0-DEV.469"
+if VERSION >= v"1.11.0-DEV.469"
     eval(Meta.parse("""
         public
             ZSTD_minCLevel,

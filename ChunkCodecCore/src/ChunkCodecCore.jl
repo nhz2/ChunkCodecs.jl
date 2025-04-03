@@ -7,8 +7,6 @@ if VERSION >= v"1.11.0-DEV.469"
         public
             Codec,
             EncodeOptions,
-            Codec,
-            EncodeOptions,
             DecodeOptions,
 
             DecodingError,

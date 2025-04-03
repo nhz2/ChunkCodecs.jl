@@ -22,7 +22,7 @@ export BloscCodec,
     BloscDecodeOptions,
     BloscDecodingError
 
-@static if VERSION >= v"1.11.0-DEV.469"
+if VERSION >= v"1.11.0-DEV.469"
     eval(Meta.parse("public is_compressor_valid, compcode, compname"))
 end
 

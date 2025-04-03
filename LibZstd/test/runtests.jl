@@ -98,7 +98,7 @@ end
     )
 end
 @testset "public" begin
-    @static if VERSION >= v"1.11.0-DEV.469"
+    if VERSION >= v"1.11.0-DEV.469"
         for sym in (
             :ZSTD_minCLevel,
             :ZSTD_maxCLevel,
