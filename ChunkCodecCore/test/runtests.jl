@@ -43,7 +43,9 @@ end
 @testset "check helpers" begin
     @test_throws Exception ChunkCodecCore.check_contiguous(@view(zeros(UInt8, 8)[1:2:end]))
     @test_throws Exception ChunkCodecCore.check_contiguous(0x00:0xFF)
-    @test isnothing(ChunkCodecCore.check_contiguous(Memory{UInt8}(undef, 3)))
+    if VERSION ≥ v"1.11"
+        @test isnothing(ChunkCodecCore.check_contiguous(Memory{UInt8}(undef, 3)))
+    end
     @test isnothing(ChunkCodecCore.check_contiguous(Vector{UInt8}(undef, 3)))
     @test isnothing(ChunkCodecCore.check_contiguous(@view(zeros(UInt8, 8)[1:1:end])))
     @test_throws ArgumentError ChunkCodecCore.check_in_range(1:6; x=0)
@@ -87,4 +89,42 @@ end
     # negative max_size
     @test_throws DecodedSizeError(Int64(-1), nothing) decode(d, ones(UInt8, Int64(100)); max_size=Int64(-1))
     @test_throws DecodedSizeError(typemin(Int64), nothing) decode(d, ones(UInt8, Int64(100)); max_size=typemin(Int128))
+end
+@testset "public" begin
+    if VERSION >= v"1.11.0-DEV.469"
+        for sym in (
+            :Codec,
+            :EncodeOptions,
+            :DecodeOptions,
+
+            :DecodingError,
+            :DecodedSizeError,
+
+            :decode_options,
+
+            :decoded_size_range,
+            :encode_bound,
+            :try_encode!,
+
+            :try_find_decoded_size,
+            :try_decode!,
+
+            :check_in_range,
+            :check_contiguous,
+
+            :can_concatenate,
+            :is_thread_safe,
+            :try_resize_decode!,
+
+            :NoopCodec,
+            :NoopEncodeOptions,
+            :NoopDecodeOptions,
+
+            :ShuffleCodec,
+            :ShuffleEncodeOptions,
+            :ShuffleDecodeOptions
+        )
+            @test Base.ispublic(ChunkCodecCore, sym)
+        end
+    end
 end
