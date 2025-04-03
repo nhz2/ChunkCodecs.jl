@@ -1,4 +1,4 @@
-@static if VERSION ≥ v"1.11"
+@static if VERSION ≥ v"1.11.0-DEV.469"
     macro public(s::Symbol)
         return esc(Expr(:public, s))
     end
