@@ -1,7 +1,12 @@
 include("hdf5_helpers.jl")
 
 using HDF5
-using ChunkCodecs
+using
+    ChunkCodecLibZstd,
+    ChunkCodecLibBlosc,
+    ChunkCodecLibBzip2,
+    ChunkCodecLibZlib,
+    ChunkCodecCore
 using ChunkCodecTests: rand_test_data
 using Test
 # Trigger HDF5 filter loading

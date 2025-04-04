@@ -1,5 +1,12 @@
 using PythonCall
-using ChunkCodecs
+using
+    ChunkCodecLibBlosc,
+    ChunkCodecLibBzip2,
+    ChunkCodecLibLz4,
+    ChunkCodecLibSnappy,
+    ChunkCodecLibZlib,
+    ChunkCodecLibZstd,
+    ChunkCodecCore
 using ChunkCodecTests: rand_test_data
 using Test
 

@@ -10,7 +10,6 @@ ChunkCodecLibLz4 = "7e9cc85e-5614-42a3-ad86-b78f920b38a5"
 ChunkCodecLibZlib = "4c0bbee4-addc-4d73-81a0-b6caacae83c8"
 ChunkCodecLibZstd = "55437552-ac27-4d47-9aa3-63184e8fd398"
 ChunkCodecTests = "06b1ce50-b741-4199-b118-ba5fe1a70fa7"
-ChunkCodecs = "cea5061e-088a-433e-a623-54fa23d14d8f"
 CodecBzip2 = "523fee87-0ab8-5b00-afb7-3ecf72e48cfd"
 CodecZstd = "6b39b394-51ab-5f42-8807-6242bab2b4c2"
 CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
@@ -27,8 +26,8 @@ ChunkCodecCore = {path = "../ChunkCodecCore"}
 ChunkCodecLibBlosc = {path = "../LibBlosc"}
 ChunkCodecLibBzip2 = {path = "../LibBzip2"}
 ChunkCodecLibLz4 = {path = "../LibLz4"}
+ChunkCodecLibSnappy = {path = "../LibSnappy"}
 ChunkCodecLibZlib = {path = "../LibZlib"}
 ChunkCodecLibZstd = {path = "../LibZstd"}
 ChunkCodecTests = {path = "../ChunkCodecTests"}
-ChunkCodecs = {path = "../ChunkCodecs"}
 HDF5 = {rev = "master", url = "https://github.com/JuliaIO/HDF5.jl.git"}
