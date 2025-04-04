@@ -28,8 +28,6 @@ jobs:
       id: filter
       with:
         filters: |
-          ChunkCodecs:
-            - ./**
           ChunkCodecCore:
             - .github/**
             - ChunkCodecCore/**

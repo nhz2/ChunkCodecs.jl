@@ -14,13 +14,13 @@ This monorepo holds a number of different Julia packages:
 
 - `ChunkCodecCore`: defines the interface.
 - `ChunkCodecTests`: defines tests for the interface.
-- `ChunkCodecs`: uses all the other ChunkCodec* packages.
 
 There are also a number of packages with glue code to implement the interface for various C libraries.
 
 - `LibBlosc`
 - `LibBzip2`
 - `LibLz4`
+- `LibSnappy`
 - `LibZlib`
 - `LibZstd`
 
