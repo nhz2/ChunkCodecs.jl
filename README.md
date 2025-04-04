@@ -1,6 +1,6 @@
 # ChunkCodecs (WIP)
 
-[![CI](https://github.com/nhz2/ChunkCodecs.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/nhz2/ChunkCodecs.jl/actions/workflows/CI.yml)
+[![CI](https://github.com/JuliaIO/ChunkCodecs.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaIO/ChunkCodecs.jl/actions/workflows/CI.yml)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
 ## Warning: ChunkCodecs is currently a WIP and its API may drastically change at any time.
